@@ -1,0 +1,6 @@
+{
+  "globalDependencies": {
+    "jquery": "registry:dt/jquery#1.10.0+20160417213236",
+    "svgjs": "registry:dt/svgjs#0.0.0+20160317120654"
+  }
+}

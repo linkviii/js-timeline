@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "target":"ES2015"
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "typings/index.d.ts",
+    "timeline.ts"
+  ]
+}
