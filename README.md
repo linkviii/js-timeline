@@ -1,2 +1,10 @@
 # js-timeline
-javascript translation of https://github.com/jasonreisman/Timeline. (Forked: formated and slightly documented https://github.com/Linkviii/Timeline) Currently broken. `simple_timeline_ref.svg` generated from original python using `simple_timeline.json`. Renders right in chrome but not firefox.
+Generate svg timelines with javascript. 
+
+Based on https://github.com/jasonreisman/Timeline written in python. (Forked: formated and slightly documented https://github.com/Linkviii/Timeline). Almost compatible with original. 
+
+```
+new Timeline("details.json", "timelineID").build();
+```
+
+MIT licensed 

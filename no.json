@@ -1,0 +1,144 @@
+{
+  "width": 1400,
+  "end": "01/04/2016",
+  "tick_format": "%Y-%m-%d",
+  "callouts": [
+    [
+      "Started Clannad",
+      "12/23/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Clannad",
+      "12/24/2015",
+      "#CD3F85"
+    ],
+    [
+      "Clannad Movie",
+      "12/24/2015"
+    ],
+    [
+      "Started Clannad: After Story",
+      "12/24/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Clannad: After Story",
+      "12/30/2015",
+      "#CD3F85"
+    ],
+    [
+      "Clannad: After Story - Mou Hitotsu no Sekai, Kyou-hen",
+      "12/30/2015"
+    ],
+    [
+      "Clannad: Mou Hitotsu no Sekai, Tomoyo-hen",
+      "12/24/2015"
+    ],
+    [
+      "Started D-Frag!",
+      "12/22/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished D-Frag!",
+      "12/23/2015",
+      "#CD3F85"
+    ],
+    [
+      "D-Frag! OVA",
+      "12/23/2015"
+    ],
+    [
+      "Started Death Note",
+      "12/30/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Death Note",
+      "01/02/2016",
+      "#CD3F85"
+    ],
+    [
+      "Started Fate/stay night",
+      "12/09/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Fate/stay night",
+      "12/10/2015",
+      "#CD3F85"
+    ],
+    [
+      "Fate/stay night Movie: Unlimited Blade Works",
+      "12/11/2015"
+    ],
+    [
+      "Started Fate/stay night: Unlimited Blade Works",
+      "12/11/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Fate/stay night: Unlimited Blade Works",
+      "12/13/2015",
+      "#CD3F85"
+    ],
+    [
+      "Fate/stay night: Unlimited Blade Works - Prologue",
+      "12/11/2015"
+    ],
+    [
+      "Started Fate/stay night: Unlimited Blade Works 2nd Season",
+      "12/13/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Fate/stay night: Unlimited Blade Works 2nd Season",
+      "12/15/2015",
+      "#CD3F85"
+    ],
+    [
+      "Started Fate/Zero",
+      "12/07/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Fate/Zero",
+      "12/08/2015",
+      "#CD3F85"
+    ],
+    [
+      "Fate/Zero 2nd Season",
+      "12/09/2015"
+    ],
+    [
+      "Hentai Ouji to Warawanai Neko.",
+      "01/04/2016"
+    ],
+    [
+      "Started Mahou Shoujo Madoka\u2605Magica",
+      "12/16/2015",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Mahou Shoujo Madoka\u2605Magica",
+      "12/22/2015",
+      "#CD3F85"
+    ],
+    [
+      "Mahou Shoujo Madoka\u2605Magica Movie 3: Hangyaku no Monogatari",
+      "12/22/2015"
+    ],
+    [
+      "Started Rakudai Kishi no Cavalry",
+      "01/02/2016",
+      "#C0C0FF"
+    ],
+    [
+      "Finished Rakudai Kishi no Cavalry",
+      "01/03/2016",
+      "#CD3F85"
+    ]
+  ],
+  "start": "12/8/2015"
+}
