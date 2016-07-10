@@ -28,9 +28,22 @@ function p(o:any):void {
     console.log(o);
 }
 
+/**
+ * Interface of controlling json
+ */
+interface TimelineData{
+    width:number;
+    start:string;
+    end:string;
+    num_ticks:number;
+    tick_format:string;
+    callouts:Array<any>;
+    eras:Array<any>;
+}
+
 class Timeline {
 
-    public data;
+    public data:TimelineData;
 
     public start_date:Date;
     public end_date:Date;
@@ -53,41 +66,26 @@ class Timeline {
     public drawing;
     public g_axis;
 
-    private loadData(filename) {
-        const data = (function () {
-            let json = null;
-            $.ajax({
-                'async': false,
-                'global': false,
-                'url': filename,
-                'dataType': "json",
-                'success': function (data) {
-                    json = data;
-                }
-            });
-            return json;
-        })();
-        return data;
-    }
+
 
     ///
     //__init__
     ///
-    constructor(filename:string, id:string) {
+    constructor(data:TimelineData, id:string) {
 
-        this.data = this.loadData(filename);
+        this.data = data;//this.loadData(filename);
 
 
         //# create drawing
-        this.width = this.data['width'];
+        this.width = this.data.width;
 
-        this.drawing = SVG(id)//.size(1000, 1000);
+        this.drawing = SVG(id);
 
         this.g_axis = this.drawing.group();
 
 
-        this.start_date = new Date(this.data['start']);
-        this.end_date = new Date(this.data['end']);
+        this.start_date = new Date(this.data.start);
+        this.end_date = new Date(this.data.end);
 
         const delta:number = (this.end_date.valueOf() - this.start_date.valueOf());// / 1000;
         const padding:number = (new Date(delta * 0.1)).valueOf();
@@ -161,7 +159,7 @@ class Timeline {
         }
 
         //# create eras
-        let eras_data = this.data['eras'];
+        let eras_data = this.data.eras;
         let markers = {};
 
         for (let era of eras_data) {
@@ -274,7 +272,7 @@ class Timeline {
         if ('num_ticks' in this.data) {
             let delta = this.end_date.valueOf() - this.start_date.valueOf();
             //let secs = delta / 1000
-            let num_ticks = this.data['num_tics'];
+            let num_ticks = this.data.num_ticks;
             //needs more?
             for (let j = 1; j < num_ticks; j++) {
                 let tick_delta = /*new Date*/(j * delta / num_ticks);
@@ -289,7 +287,7 @@ class Timeline {
             return;
         }
 
-        const eras_data = this.data['eras'];
+        const eras_data = this.data.eras;
 
         //error? yess error. fucj javascript
         //console.log(eras_data)
@@ -369,7 +367,7 @@ class Timeline {
         if (!('callouts' in this.data)) {
             return;//undefined
         }
-        let callouts_data = this.data['callouts'];
+        let callouts_data = this.data.callouts;
 
         //# sort callouts
         let sorted_dates:Array<number> = [];

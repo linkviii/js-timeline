@@ -27,14 +27,14 @@ class Timeline {
     ///
     //__init__
     ///
-    constructor(filename, id) {
-        this.data = this.loadData(filename);
+    constructor(data, id) {
+        this.data = data; //this.loadData(filename);
         //# create drawing
-        this.width = this.data['width'];
-        this.drawing = SVG(id); //.size(1000, 1000);
+        this.width = this.data.width;
+        this.drawing = SVG(id);
         this.g_axis = this.drawing.group();
-        this.start_date = new Date(this.data['start']);
-        this.end_date = new Date(this.data['end']);
+        this.start_date = new Date(this.data.start);
+        this.end_date = new Date(this.data.end);
         const delta = (this.end_date.valueOf() - this.start_date.valueOf()); // / 1000;
         const padding = (new Date(delta * 0.1)).valueOf();
         this.date0 = this.start_date.valueOf() - padding;
@@ -55,22 +55,6 @@ class Timeline {
         //# max_label_height stores the max height of all axis labels
         //# and is used in the final height computation in build(self)
         this.max_label_height = 0;
-    }
-    loadData(filename) {
-        const data = (function () {
-            let json = null;
-            $.ajax({
-                'async': false,
-                'global': false,
-                'url': filename,
-                'dataType': "json",
-                'success': function (data) {
-                    json = data;
-                }
-            });
-            return json;
-        })();
-        return data;
     }
     ///
     //END __init__
@@ -104,7 +88,7 @@ class Timeline {
             return;
         }
         //# create eras
-        let eras_data = this.data['eras'];
+        let eras_data = this.data.eras;
         let markers = {};
         for (let era of eras_data) {
             //# extract era data
@@ -186,7 +170,7 @@ class Timeline {
         if ('num_ticks' in this.data) {
             let delta = this.end_date.valueOf() - this.start_date.valueOf();
             //let secs = delta / 1000
-            let num_ticks = this.data['num_tics'];
+            let num_ticks = this.data.num_ticks;
             //needs more?
             for (let j = 1; j < num_ticks; j++) {
                 let tick_delta = (j * delta / num_ticks);
@@ -199,7 +183,7 @@ class Timeline {
         if (!('eras' in this.data)) {
             return;
         }
-        const eras_data = this.data['eras'];
+        const eras_data = this.data.eras;
         //error? yess error. fucj javascript
         //console.log(eras_data)
         for (let era of eras_data) {
@@ -259,7 +243,7 @@ class Timeline {
         if (!('callouts' in this.data)) {
             return; //undefined
         }
-        let callouts_data = this.data['callouts'];
+        let callouts_data = this.data.callouts;
         //# sort callouts
         let sorted_dates = [];
         let inv_callouts = new Map(); //{};
