@@ -10,7 +10,7 @@
   ],
   "files": [
     "typings/index.d.ts",
-    "timeline.ts",
-    "main.ts"
+    "src/timeline.ts",
+    "src/main.ts"
   ]
 }
