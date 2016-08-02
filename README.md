@@ -6,12 +6,12 @@ Based on https://github.com/jasonreisman/Timeline written in python. (Forked: fo
 ```
 new Timeline(data, "timelineID").build();
 ```
-Data object is basically the same as the original json.
+Data object is basically the same as the original project's json. See `res/simple_timeline.json` for an example.
 
 ```TypeScript
 /**
  * Interface of controlling json
- * start/end YYYY-MM-DD
+ * start/end YYYY-MM-DD (currently `new Date(str);`)
  */
 interface TimelineData {
     width:number;
