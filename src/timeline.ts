@@ -18,7 +18,7 @@
 let Colors = {black: '#000000', gray: '#C0C0C0'};
 
 
-function p(o:any):void {
+function p(o: any): void {
     console.log(o);
 }
 
@@ -27,53 +27,53 @@ function p(o:any):void {
  * start/end YYYY-MM-DD (currently `new Date(str);`)
  */
 interface TimelineData {
-    width:number;
-    start:string;
-    end:string;
-    num_ticks?:number;
-    tick_format?:string;
+    width: number;
+    start: string;
+    end: string;
+    num_ticks?: number;
+    tick_format?: string;
     //[[description, date, ?color],...]
-    callouts?:Array<[string, string]|[string, string, string]>;
+    callouts?: Array<[string, string]|[string, string, string]>;
     //[[name, start, end, ?color],...]
-    eras?:Array<[string, string, string]|[string, string, string, string]>;
+    eras?: Array<[string, string, string]|[string, string, string, string]>;
 }
 
 /**
  * add_axis_label kw
  */
 interface LabelKW {
-    tick?:boolean;
-    stroke?:string;
-    fill?:string;
+    tick?: boolean;
+    stroke?: string;
+    fill?: string;
 }
 
 class Timeline {
 
-    public data:TimelineData;
+    public data: TimelineData;
 
-    public start_date:Date;
-    public end_date:Date;
+    public start_date: Date;
+    public end_date: Date;
 
-    public date0:number;
-    public date1:number;
-    public total_secs:number;
+    public date0: number;
+    public date1: number;
+    public total_secs: number;
 
-    public callout_size:[number,number,number];
-    public text_fudge:[number,number];
-    public tick_format:string;
+    public callout_size: [number, number, number];
+    public text_fudge: [number, number];
+    public tick_format: string;
     public markers;
 
     //public fonts;
 
-    public max_label_height:number;
+    public max_label_height: number;
 
-    public width:number;
+    public width: number;
 
     public drawing;
     public g_axis;
 
 
-    constructor(data:TimelineData, id:string) {
+    constructor(data: TimelineData, id: string) {
 
         this.data = data;
         this.width = this.data.width;
@@ -84,8 +84,8 @@ class Timeline {
         this.start_date = new Date(this.data.start);
         this.end_date = new Date(this.data.end);
 
-        const delta:number = (this.end_date.valueOf() - this.start_date.valueOf());
-        const padding:number = (new Date(delta * 0.1)).valueOf();
+        const delta: number = (this.end_date.valueOf() - this.start_date.valueOf());
+        const padding: number = (new Date(delta * 0.1)).valueOf();
 
         this.date0 = this.start_date.valueOf() - padding;
         this.date1 = this.end_date.valueOf() + padding;
@@ -107,10 +107,10 @@ class Timeline {
     }
 
 
-    build():void {
+    build(): void {
         //# MAGIC NUMBER: y_era
         //# draw era label and markers at this height
-        const y_era:number = 10;
+        const y_era: number = 10;
 
         //# create main axis and callouts,
         //# keeping track of how high the callouts are
@@ -118,10 +118,10 @@ class Timeline {
         const y_callouts = this.create_callouts();
 
         //# determine axis position so that axis + callouts don't overlap with eras
-        const y_axis:number = y_era + this.callout_size[1] - y_callouts;
+        const y_axis: number = y_era + this.callout_size[1] - y_callouts;
 
         //# determine height so that eras, callouts, axis, and labels just fit
-        const height:number = y_axis + this.max_label_height + 4 * this.text_fudge[1];
+        const height: number = y_axis + this.max_label_height + 4 * this.text_fudge[1];
 
         //# create eras and labels using axis height and overall height
         this.create_eras(y_era, y_axis, height);
@@ -136,35 +136,35 @@ class Timeline {
     }
 
 
-    create_eras(y_era:number, y_axis:number, height:number):void {
+    create_eras(y_era: number, y_axis: number, height: number): void {
         if (!('eras' in this.data)) {
             return;
         }
 
         //# create eras
-        let eras_data:Array<Array<string>> = this.data.eras;
+        let eras_data: Array<Array<string>> = this.data.eras;
         //let markers = {};
 
         for (let era of eras_data) {
             //# extract era data
 
-            const name:string = era[0];
+            const name: string = era[0];
 
-            const t0:number = (new Date(era[1])).valueOf();
-            const t1:number = (new Date(era[2])).valueOf();
+            const t0: number = (new Date(era[1])).valueOf();
+            const t1: number = (new Date(era[2])).valueOf();
 
-            const fill:string = (era.length > 3) ? era[3] : Colors.gray;
+            const fill: string = (era.length > 3) ? era[3] : Colors.gray;
 
 
             const [start_marker, end_marker] = this.get_markers(fill);
 
 
             //# create boundary lines
-            const percent_width0:number = (t0 - this.date0) / 1000 / this.total_secs;
-            const percent_width1:number = (t1 - this.date0) / 1000 / this.total_secs;
+            const percent_width0: number = (t0 - this.date0) / 1000 / this.total_secs;
+            const percent_width1: number = (t1 - this.date0) / 1000 / this.total_secs;
 
-            const x0:number = Math.trunc(percent_width0 * this.width + 0.5);
-            const x1:number = Math.trunc(percent_width1 * this.width + 0.5);
+            const x0: number = Math.trunc(percent_width0 * this.width + 0.5);
+            const x1: number = Math.trunc(percent_width1 * this.width + 0.5);
 
 
             const rect = this.drawing.rect(x1 - x0, height);
@@ -215,7 +215,7 @@ class Timeline {
      * @param {String} color
      * @return {Array<marker, marker>}
      */
-    get_markers(color:string):[any,any] {
+    get_markers(color: string): [any, any] {
 
         let start_marker;
         let end_marker;
@@ -262,12 +262,12 @@ class Timeline {
     }
 
 
-    create_era_axis_labels():void {
+    create_era_axis_labels(): void {
         if (!('eras' in this.data)) {
             return;
         }
 
-        const eras_data:Array<Array<string>> = this.data.eras;
+        const eras_data: Array<Array<string>> = this.data.eras;
 
         for (let era of eras_data) {
             let t0 = new Date(era[1]);
@@ -279,7 +279,7 @@ class Timeline {
 
 
     //def add_axis_label(self, dt, label, **kwargs):
-    add_axis_label(dt:Date, label:string, kw?:LabelKW) {
+    add_axis_label(dt: Date, label: string, kw?: LabelKW) {
         //date, string?
         kw = kw || {};
 
@@ -288,20 +288,20 @@ class Timeline {
             // label = dt
             //TODO tick format
         }
-        const percent_width:number = (dt.valueOf() - this.date0) / 1000 / this.total_secs;
+        const percent_width: number = (dt.valueOf() - this.date0) / 1000 / this.total_secs;
         if (percent_width < 0 || percent_width > 1) {
             //error? Log?
             console.log(dt);
             return;
         }
 
-        const x:number = Math.trunc(percent_width * this.width + 0.5);
-        const dy:number = 5;
+        const x: number = Math.trunc(percent_width * this.width + 0.5);
+        const dy: number = 5;
 
         // # add tick on line
-        const add_tick:boolean = kw.tick || true;
+        const add_tick: boolean = kw.tick || true;
         if (add_tick) {
-            const stroke:string = kw.stroke || Colors.black;
+            const stroke: string = kw.stroke || Colors.black;
             const line = this.drawing.line(x, -dy, x, dy)
                 .stroke({color: stroke, width: 2});
 
@@ -309,7 +309,7 @@ class Timeline {
         }
 
         // # add label
-        const fill:string = kw.fill || Colors.gray;
+        const fill: string = kw.fill || Colors.gray;
 
 
         /*
@@ -336,7 +336,7 @@ class Timeline {
      *
      * @returns {number} min_y ?
      */
-    create_callouts():number {
+    create_callouts(): number {
 
         type Info = [string, string];
 
@@ -344,26 +344,26 @@ class Timeline {
         if (!('callouts' in this.data)) {
             return;//undefined
         }
-        const callouts_data:Array<Array<string>> = this.data.callouts;
+        const callouts_data: Array<Array<string>> = this.data.callouts;
 
         //# sort callouts
-        const sorted_dates:Array<number> = [];
-        const inv_callouts:Map<number, Array<Info>> = new Map();
+        const sorted_dates: Array<number> = [];
+        const inv_callouts: Map<number, Array<Info>> = new Map();
 
         for (let callout of callouts_data) {
 
-            const tmp:string = callout[1];
-            const event_date:number = (new Date(tmp)).valueOf();
+            const tmp: string = callout[1];
+            const event_date: number = (new Date(tmp)).valueOf();
 
-            const event:string = callout[0];
-            const event_color:string = callout[2] || Colors.black;
+            const event: string = callout[0];
+            const event_color: string = callout[2] || Colors.black;
 
             sorted_dates.push(event_date);
             if (!( inv_callouts.has(event_date))) {
                 inv_callouts.set(event_date, []);// [event_date] = []
             }
-            const newInfo:Info = [event, event_color];
-            const events:Array<Info> = inv_callouts.get(event_date);
+            const newInfo: Info = [event, event_color];
+            const events: Array<Info> = inv_callouts.get(event_date);
             events.push(newInfo);
 
         }
@@ -377,19 +377,19 @@ class Timeline {
             const [event, event_color]:Info = inv_callouts.get(event_date).pop();
 
 
-            const num_sec:number = (event_date - this.date0) / 1000;
-            const percent_width:number = num_sec / this.total_secs;
+            const num_sec: number = (event_date - this.date0) / 1000;
+            const percent_width: number = num_sec / this.total_secs;
             if (percent_width < 0 || percent_width > 1) {
                 continue;
             }
 
-            const x:number = Math.trunc(percent_width * this.width + 0.5);
+            const x: number = Math.trunc(percent_width * this.width + 0.5);
 
             //# figure out what 'level" to make the callout on
-            let k:number = 0;
-            let i:number = prev_x.length - 1;
+            let k: number = 0;
+            let i: number = prev_x.length - 1;
 
-            const left:number = x - (Timeline.get_text_metrics('Helevetica', 6, event)[0]
+            const left: number = x - (Timeline.get_text_metrics('Helevetica', 6, event)[0]
                 + this.callout_size[0] + this.text_fudge[0]);
 
             while (left < prev_x[i] && i >= 0) {
@@ -397,12 +397,12 @@ class Timeline {
                 i -= 1;
             }
 
-            const y:number = 0 - this.callout_size[1] - k * this.callout_size[2];
+            const y: number = 0 - this.callout_size[1] - k * this.callout_size[2];
             min_y = Math.min(min_y, y);
 
             //path_data = 'M%i,%i L%i,%i L%i,%i'
             // % (x, 0, x, y, x - self.callout_size[0], y)
-            const path_data:string = 'M' + x + ',' + 0 + ' L' + x + ',' + y + ' L'
+            const path_data: string = 'M' + x + ',' + 0 + ' L' + x + ',' + y + ' L'
                 + (x - this.callout_size[0]) + ',' + y;
 
             const pth = this.drawing.path(path_data).stroke({color: event_color, width: 1});//fill none?
@@ -417,7 +417,7 @@ class Timeline {
 
             this.g_axis.add(txt);
 
-            const eDate:Date = new Date(event_date);
+            const eDate: Date = new Date(event_date);
             this.add_axis_label(eDate, eDate.toLocaleString(),
                 {tick: false, fill: Colors.black});
 
@@ -440,9 +440,9 @@ class Timeline {
 
     }
 
-    static get_text_metrics(family:string, size:number, text:string):[number,number] {
+    static get_text_metrics(family: string, size: number, text: string): [number, number] {
 
-        const c:any = document.getElementById("dummyCanvas");
+        const c: any = document.getElementById("dummyCanvas");
         const ctx = c.getContext("2d");
         ctx.font = size + " " + family;
         const w = ctx.measureText(text).width;

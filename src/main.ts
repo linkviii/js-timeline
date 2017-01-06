@@ -3,7 +3,7 @@ let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
 
 //
 
-function loadData(filename:string):any {
+function loadData(filename: string): any {
     return (function () {
         let json = null;
         $.ajax({
@@ -26,8 +26,8 @@ const sample = "res/simple_timeline.json";
 const anime = "res/no.json";
 
 
-const foo:TimelineData = loadData(sample);
-const bar:TimelineData = loadData(anime);
+const foo: TimelineData = loadData(sample);
+const bar: TimelineData = loadData(anime);
 
 const tl = new Timeline(foo, "sampleTimeline");
 const t2 = new Timeline(bar, "animeTimeline");
