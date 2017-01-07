@@ -5,7 +5,7 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 8/1/2016
+ * v 2017-1-7
  *   (Try to change with new features. Not strict.)
  * 
  * MIT licenced
@@ -15,7 +15,7 @@
 /**
  *color constant
  */
-let Colors = {black: '#000000', gray: '#C0C0C0'};
+let Colors: {black: string, gray: string} = {black: '#000000', gray: '#C0C0C0'};
 
 
 function p(o: any): void {
@@ -32,10 +32,44 @@ interface TimelineData {
     end: string;
     num_ticks?: number;
     tick_format?: string;
+    callouts?;
+    eras?;
+}
+
+interface TimelineDataV1 extends TimelineData {
+    width: number;
+    start: string;
+    end: string;
+    num_ticks?: number;
+    tick_format?: string;
     //[[description, date, ?color],...]
     callouts?: Array<[string, string]|[string, string, string]>;
     //[[name, start, end, ?color],...]
     eras?: Array<[string, string, string]|[string, string, string, string]>;
+}
+
+interface TimelineCalloutV2 {
+    description: string;
+    date: string;
+    color?: string;
+}
+
+interface TimelineEraV2 {
+    name: string;
+    startDate: string;
+    endDate: string;
+    color?: string;
+}
+
+interface TimelineDataV2 extends TimelineData {
+    apiVersion: number;
+    width: number;
+    start: string;
+    end: string;
+    numTicks?: number;
+    tickFormat?: string;
+    callouts?: TimelineCalloutV2[];
+    eras?: TimelineEraV2[];
 }
 
 /**
