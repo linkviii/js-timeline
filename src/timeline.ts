@@ -5,7 +5,7 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 2017-1-7
+ * v 2017-1-7 *
  *   (Try to change with new features. Not strict.)
  * 
  * MIT licenced
@@ -27,23 +27,12 @@ function p(o: any): void {
  * start/end YYYY-MM-DD (currently `new Date(str);`)
  */
 //Base interface is useless
-interface TimelineData {
-    width: number;
+type TimelineData = TimelineDataV1 | TimelineDataV2;
 
-    start?: string;
-    end?: string;
-    startDate?: string;
-    endDate?: string;
-
-    num_ticks?: number;
-    tick_format?: string;
-    callouts?;
-    eras?;
-}
-
+//V1
 type TimelineCalloutV1 = [string, string]|[string, string, string];
 type TimelineEraV1 = [string, string, string]|[string, string, string, string];
-interface TimelineDataV1 extends TimelineData {
+interface TimelineDataV1 {
     width: number;
     start: string;
     end: string;
@@ -55,6 +44,7 @@ interface TimelineDataV1 extends TimelineData {
     eras?: TimelineEraV1[];
 }
 
+//V2
 interface TimelineCalloutV2 {
     description: string;
     date: string;
@@ -68,9 +58,7 @@ interface TimelineEraV2 {
     color?: string;
 }
 
-// extension is a type hack. Incompatible with V1
-//
-interface TimelineDataV2 extends TimelineData {
+interface TimelineDataV2 {
     apiVersion: number;
     width: number;
     startDate: string;
@@ -99,7 +87,7 @@ function convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
         return callouts;
     }
 
-    function convertEras(oldEras:TimelineEraV1[]):TimelineEraV2[]{
+    function convertEras(oldEras: TimelineEraV1[]): TimelineEraV2[] {
         const eras: TimelineEraV2[] = [];
         for (let oldEra of oldEras) {
             const newEra: TimelineEraV2 = {
@@ -184,12 +172,12 @@ class Timeline {
     public axisGroup;
 
     // initializes data for timeline
-    constructor(data: TimelineDataV1|TimelineDataV2, id: string) {
+    constructor(data: TimelineData, id: string) {
 
-        if ((<TimelineDataV2>data).apiVersion == 2){
+        if ((<TimelineDataV2>data).apiVersion == 2) {
             this.data = <TimelineDataV2>data;
-        }else{
-            this.data = convertTimelineDataV1ToV2( <TimelineDataV1>data);
+        } else {
+            this.data = convertTimelineDataV1ToV2(<TimelineDataV1>data);
         }
 
 
@@ -274,7 +262,7 @@ class Timeline {
             const t0: number = (new Date(era.startDate)).valueOf();
             const t1: number = (new Date(era.endDate)).valueOf();
 
-            const fill: string =  era.color || Colors.gray;
+            const fill: string = era.color || Colors.gray;
 
 
             const [startMarker, endMarker] = this.getMarkers(fill);
