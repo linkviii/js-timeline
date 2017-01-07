@@ -145,31 +145,31 @@ interface LabelKW {
 
 class Timeline {
 
-    public data: TimelineDataV2;
+    public readonly data: TimelineDataV2;
 
-    public startDate: Date;
-    public endDate: Date;
+    public readonly startDate: Date;
+    public readonly endDate: Date;
 
-    public date0: number;
-    public date1: number;
-    public totalSeconds: number;
+    public readonly date0: number;
+    public readonly date1: number;
+    public readonly totalSeconds: number;
 
     //public callout_size: [number, number, number];
-    public calloutProperties: {width: number, height: number, increment: number};
+    public readonly calloutProperties: {width: number, height: number, increment: number};
 
 
-    public textFudge: [number, number];
-    public tickFormat: string;
-    public markers;
+    public readonly textFudge: [number, number];
+    public readonly tickFormat: string;
+    public readonly markers;
 
     //public fonts;
 
     public maxLabelHeight: number;
 
-    public width: number;
+    public readonly width: number;
 
-    public drawing;
-    public axisGroup;
+    public readonly drawing;
+    public readonly axisGroup;
 
     // initializes data for timeline
     constructor(data: TimelineData, id: string) {
