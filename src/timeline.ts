@@ -81,7 +81,7 @@ interface TimelineDataV2 extends TimelineData {
     eras?: TimelineEraV2[];
 }
 
-function convertTimelineDataV1ToV1(oldData: TimelineDataV1): TimelineDataV2 {
+function convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
 
     function convertCallouts(oldCallouts: TimelineCalloutV1[]): TimelineCalloutV2[] {
         const callouts: TimelineCalloutV2[] = [];
@@ -150,9 +150,14 @@ interface LabelKW {
     fill?: string;
 }
 
+
+//
+//
+//
+
 class Timeline {
 
-    public data: TimelineData;
+    public data: TimelineDataV2;
 
     public startDate: Date;
     public endDate: Date;
@@ -179,16 +184,22 @@ class Timeline {
     public axisGroup;
 
     // initializes data for timeline
-    constructor(data: TimelineData, id: string) {
+    constructor(data: TimelineDataV1|TimelineDataV2, id: string) {
 
-        this.data = data;
+        if ((<TimelineDataV2>data).apiVersion == 2){
+            this.data = <TimelineDataV2>data;
+        }else{
+            this.data = convertTimelineDataV1ToV2( <TimelineDataV1>data);
+        }
+
+
         this.width = this.data.width;
 
         this.drawing = SVG(id);
         this.axisGroup = this.drawing.group();
 
-        this.startDate = new Date(this.data.start);
-        this.endDate = new Date(this.data.end);
+        this.startDate = new Date(this.data.startDate);
+        this.endDate = new Date(this.data.endDate);
 
         const delta: number = (this.endDate.valueOf() - this.startDate.valueOf());
         const padding: number = (new Date(delta * 0.1)).valueOf();
@@ -206,7 +217,7 @@ class Timeline {
 
         this.textFudge = [3, 1.5];
         // TODO use
-        this.tickFormat = this.data.tick_format;
+        this.tickFormat = this.data.tickFormat;
 
         this.markers = {};
 
@@ -252,18 +263,18 @@ class Timeline {
         }
 
         //# create eras
-        let erasData: Array<Array<string>> = this.data.eras;
+        let erasData: TimelineEraV2[] = this.data.eras;
         //let markers = {};
 
         for (let era of erasData) {
             //# extract era data
 
-            const name: string = era[0];
+            const name: string = era.name;
 
-            const t0: number = (new Date(era[1])).valueOf();
-            const t1: number = (new Date(era[2])).valueOf();
+            const t0: number = (new Date(era.startDate)).valueOf();
+            const t1: number = (new Date(era.endDate)).valueOf();
 
-            const fill: string = (era.length > 3) ? era[3] : Colors.gray;
+            const fill: string =  era.color || Colors.gray;
 
 
             const [startMarker, endMarker] = this.getMarkers(fill);
@@ -358,10 +369,10 @@ class Timeline {
         this.addAxisLabel(this.startDate, this.startDate.toDateString(), {tick: true});
         this.addAxisLabel(this.endDate, this.endDate.toDateString(), {tick: true});
 
-        if ('num_ticks' in this.data) {
+        if ('numTicks' in this.data) {
             const delta = this.endDate.valueOf() - this.startDate.valueOf();
             //let secs = delta / 1000
-            const numTicks = this.data.num_ticks;
+            const numTicks = this.data.numTicks;
             //needs more?
             for (let j = 1; j < numTicks; j++) {
                 const tickDelta = /*new Date*/(j * delta / numTicks);
@@ -377,11 +388,11 @@ class Timeline {
             return;
         }
 
-        const erasData: Array<Array<string>> = this.data.eras;
+        const erasData: TimelineEraV2[] = this.data.eras;
 
         for (let era of erasData) {
-            let t0 = new Date(era[1]);
-            let t1 = new Date(era[2]);
+            let t0 = new Date(era.startDate);
+            let t1 = new Date(era.endDate);
             this.addAxisLabel(t0, t0.toDateString());
             this.addAxisLabel(t1, t1.toDateString());
         }
@@ -454,7 +465,7 @@ class Timeline {
         if (!('callouts' in this.data)) {
             return;//undefined
         }
-        const calloutsData: Array<Array<string>> = this.data.callouts;
+        const calloutsData: TimelineCalloutV2[] = this.data.callouts;
 
         //# sort callouts
         const sortedDates: Array<number> = [];
@@ -462,11 +473,11 @@ class Timeline {
 
         for (let callout of calloutsData) {
 
-            const tmp: string = callout[1];
+            const tmp: string = callout.date;
             const eventDate: number = (new Date(tmp)).valueOf();
 
-            const event: string = callout[0];
-            const eventColor: string = callout[2] || Colors.black;
+            const event: string = callout.description;
+            const eventColor: string = callout.color || Colors.black;
 
             sortedDates.push(eventDate);
             if (!( invCallouts.has(eventDate))) {
