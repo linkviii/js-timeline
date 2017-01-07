@@ -58,7 +58,10 @@ class Timeline {
     public date1: number;
     public total_secs: number;
 
-    public callout_size: [number, number, number];
+    //public callout_size: [number, number, number];
+    public callout_properties: {width: number, height: number, increment: number};
+
+
     public text_fudge: [number, number];
     public tick_format: string;
     public markers;
@@ -72,7 +75,7 @@ class Timeline {
     public drawing;
     public g_axis;
 
-
+    // initializes data for timeline
     constructor(data: TimelineData, id: string) {
 
         this.data = data;
@@ -93,7 +96,11 @@ class Timeline {
 
         // # set up some params
         //TODO Cleanup / factor
-        this.callout_size = [10, 15, 10]; // width, height, increment
+        //this.callout_size = [10, 15, 10]; // width, height, increment
+
+
+        this.callout_properties = {width: 10, height: 15, increment: 10};
+
         this.text_fudge = [3, 1.5];
         // TODO use
         this.tick_format = this.data.tick_format;
@@ -106,7 +113,7 @@ class Timeline {
         this.max_label_height = 0;
     }
 
-
+    // Generates svg document
     build(): void {
         //# MAGIC NUMBER: y_era
         //# draw era label and markers at this height
@@ -118,7 +125,7 @@ class Timeline {
         const y_callouts = this.create_callouts();
 
         //# determine axis position so that axis + callouts don't overlap with eras
-        const y_axis: number = y_era + this.callout_size[1] - y_callouts;
+        const y_axis: number = y_era + this.callout_properties.height - y_callouts;
 
         //# determine height so that eras, callouts, axis, and labels just fit
         const height: number = y_axis + this.max_label_height + 4 * this.text_fudge[1];
@@ -196,7 +203,7 @@ class Timeline {
                     .stroke({color: fill, width: 0.75})
             );
 
-            //TODO
+            //TODO markers?
             /*
              horz['marker-start'] = start_marker.get_funciri()
              horz['marker-end'] = end_marker.get_funciri()
@@ -390,27 +397,28 @@ class Timeline {
             let i: number = prev_x.length - 1;
 
             const left: number = x - (Timeline.get_text_metrics('Helevetica', 6, event)[0]
-                + this.callout_size[0] + this.text_fudge[0]);
+                + this.callout_properties.width + this.text_fudge[0]);
 
             while (left < prev_x[i] && i >= 0) {
                 k = Math.max(k, prev_level[i] + 1);
                 i -= 1;
             }
 
-            const y: number = 0 - this.callout_size[1] - k * this.callout_size[2];
+            const y: number = 0 - this.callout_properties.height -
+                k * this.callout_properties.increment;
             min_y = Math.min(min_y, y);
 
             //path_data = 'M%i,%i L%i,%i L%i,%i'
             // % (x, 0, x, y, x - self.callout_size[0], y)
             const path_data: string = 'M' + x + ',' + 0 + ' L' + x + ',' + y + ' L'
-                + (x - this.callout_size[0]) + ',' + y;
+                + (x - this.callout_properties.width) + ',' + y;
 
             const pth = this.drawing.path(path_data).stroke({color: event_color, width: 1});//fill none?
             pth.fill("white", 0);//nothing
             this.g_axis.add(pth);
 
             const txt = this.drawing.text(event);
-            txt.dx(x - this.callout_size[0] - this.text_fudge[0]);
+            txt.dx(x - this.callout_properties.width - this.text_fudge[0]);
             txt.dy(y - 4 * this.text_fudge[1]);
             txt.font({family: 'Helevetica', size: '6pt', anchor: 'end'});
             txt.fill(event_color);

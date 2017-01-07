@@ -7,11 +7,11 @@ function loadData(filename: string): any {
     return (function () {
         let json = null;
         $.ajax({
-            'async': false,
-            'global': false,
-            'url': filename,
-            'dataType': "json",
-            'success': function (data) {
+            async: false,
+            global: false,
+            url: filename,
+            dataType: "json",
+            success: function (data) {
                 json = data;
             }
         });
