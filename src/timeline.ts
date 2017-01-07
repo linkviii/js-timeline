@@ -26,16 +26,23 @@ function p(o: any): void {
  * Interface of controlling json
  * start/end YYYY-MM-DD (currently `new Date(str);`)
  */
+//Base interface is useless
 interface TimelineData {
     width: number;
-    start: string;
-    end: string;
+
+    start?: string;
+    end?: string;
+    startDate?: string;
+    endDate?: string;
+
     num_ticks?: number;
     tick_format?: string;
     callouts?;
     eras?;
 }
 
+type TimelineCalloutV1 = [string, string]|[string, string, string];
+type TimelineEraV1 = [string, string, string]|[string, string, string, string];
 interface TimelineDataV1 extends TimelineData {
     width: number;
     start: string;
@@ -43,9 +50,9 @@ interface TimelineDataV1 extends TimelineData {
     num_ticks?: number;
     tick_format?: string;
     //[[description, date, ?color],...]
-    callouts?: Array<[string, string]|[string, string, string]>;
-    //[[name, start, end, ?color],...]
-    eras?: Array<[string, string, string]|[string, string, string, string]>;
+    callouts?: TimelineCalloutV1[];
+    //[[name, startDate, endDate, ?color],...]
+    eras?: TimelineEraV1[];
 }
 
 interface TimelineCalloutV2 {
@@ -61,15 +68,77 @@ interface TimelineEraV2 {
     color?: string;
 }
 
+// extension is a type hack. Incompatible with V1
+//
 interface TimelineDataV2 extends TimelineData {
     apiVersion: number;
     width: number;
-    start: string;
-    end: string;
+    startDate: string;
+    endDate: string;
     numTicks?: number;
     tickFormat?: string;
     callouts?: TimelineCalloutV2[];
     eras?: TimelineEraV2[];
+}
+
+function convertTimelineDataV1ToV1(oldData: TimelineDataV1): TimelineDataV2 {
+
+    function convertCallouts(oldCallouts: TimelineCalloutV1[]): TimelineCalloutV2[] {
+        const callouts: TimelineCalloutV2[] = [];
+
+        for (let oldCallout of oldCallouts) {
+            const newCallout: TimelineCalloutV2 = {
+                description: oldCallout[0],
+                date: oldCallout[1]
+            };
+            if (oldCallout.length == 3) {
+                newCallout.color = oldCallout[2]
+            }
+            callouts.push(newCallout);
+        }
+        return callouts;
+    }
+
+    function convertEras(oldEras:TimelineEraV1[]):TimelineEraV2[]{
+        const eras: TimelineEraV2[] = [];
+        for (let oldEra of oldEras) {
+            const newEra: TimelineEraV2 = {
+                name: oldEra[0],
+                startDate: oldEra[1],
+                endDate: oldEra[2]
+            };
+            if (oldEra.length == 4) {
+                newEra.color = oldEra[3];
+            }
+            eras.push(newEra);
+        }
+        return eras;
+    }
+
+    const newData: TimelineDataV2 = {
+        apiVersion: 2,
+        width: oldData.width,
+        startDate: oldData.start,
+        endDate: oldData.end
+    };
+
+    // camelCase names
+    if ('num_ticks' in oldData) {
+        newData.numTicks = oldData.num_ticks;
+    }
+    if ('tick_format' in oldData) {
+        newData.tickFormat = oldData.tick_format;
+    }
+
+    // Convert tuples to objects
+    if ('callouts' in oldData) {
+        newData.callouts = convertCallouts(oldData.callouts);
+    }
+    if ('eras' in oldData) {
+        newData.eras = convertEras(oldData.eras);
+    }
+
+    return newData;
 }
 
 /**
