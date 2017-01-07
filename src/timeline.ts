@@ -29,7 +29,7 @@ function p(o: any): void {
 //Base interface is useless
 type TimelineData = TimelineDataV1 | TimelineDataV2;
 
-//V1
+//v1
 type TimelineCalloutV1 = [string, string]|[string, string, string];
 type TimelineEraV1 = [string, string, string]|[string, string, string, string];
 interface TimelineDataV1 {
@@ -44,7 +44,7 @@ interface TimelineDataV1 {
     eras?: TimelineEraV1[];
 }
 
-//V2
+//v2
 interface TimelineCalloutV2 {
     description: string;
     date: string;
@@ -59,7 +59,7 @@ interface TimelineEraV2 {
 }
 
 interface TimelineDataV2 {
-    apiVersion: number;
+    apiVersion: number; //2
     width: number;
     startDate: string;
     endDate: string;

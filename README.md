@@ -1,43 +1,82 @@
 # js-timeline
 Generate svg timelines with javascript. Demo: http://linkviii.github.io/js-timeline/
 
-Based on https://github.com/jasonreisman/Timeline written in python. (Forked: formated and slightly documented https://github.com/Linkviii/Timeline). Almost compatible with original.
-
-```
-new Timeline(data, "timelineID").build();
-```
-Data object is basically the same as the original project's json. See `res/simple_timeline.json` for an example.
+Based on https://github.com/jasonreisman/Timeline written in python. (formated and slightly documented fork: https://github.com/Linkviii/Timeline). Almost compatible with original python implementation.
 
 ```TypeScript
-/**
- * Interface of controlling json
- * start/end YYYY-MM-DD (currently `new Date(str);`)
- */
-interface TimelineData {
-    width:number;
-    start:string;
-    end:string;
-    num_ticks?:number;
-    tick_format?:string;
-    //[[description, date, ?color],...]
-    callouts?:Array<[string, string]|[string, string, string]>;
-    //[[name, start, end, ?color],...]
-    eras?:Array<[string, string, string]|[string, string, string, string]>;
-}
+const data:TimelineData = ...;
+new Timeline(data, "timelineID").build();
+```
+Where
+```TypeScript
+type TimelineData = TimelineDataV1 | TimelineDataV2;
 ```
 
-#### Required Fields
+## Interface
+ There are 2 interface versions. v1 comes from the original python project. v2 has camelCase names (json style) and objects instead of tuples.
+### Interface v1
+Original project interface:
 
+```TypeScript
+type TimelineCalloutV1 = [string, string]|[string, string, string];
+type TimelineEraV1 = [string, string, string]|[string, string, string, string];
+interface TimelineDataV1 {
+    width: number;
+    start: string;
+    end: string;
+    num_ticks?: number;
+    tick_format?: string;
+    //[[description, date, ?color],...]
+    callouts?: TimelineCalloutV1[];
+    //[[name, startDate, endDate, ?color],...]
+    eras?: TimelineEraV1[];
+}
+```
+See `res/simple_timeline.json` for an example.
+
+### Interface v2
+New interface:
+
+```TypeScript
+interface TimelineCalloutV2 {
+    description: string;
+    date: string;
+    color?: string;
+}
+
+interface TimelineEraV2 {
+    name: string;
+    startDate: string;
+    endDate: string;
+    color?: string;
+}
+
+interface TimelineDataV2 {
+    apiVersion: number; //2
+    width: number;
+    startDate: string;
+    endDate: string;
+    numTicks?: number;
+    tickFormat?: string;
+    callouts?: TimelineCalloutV2[];
+    eras?: TimelineEraV2[];
+}
+````
+
+**Required**: `apiVersion: 2`
+
+### Interface notes
+* `colors` are hex strings.
 * `width` describes the width, in pixels, of the output SVG document.  The height will be determined automatically.
-* `start` is the date/time of the leftmost date/time on the axis.
-* `end` is the date/time of the rightmost date/time on the axis.
+* Date strings need to be in YYYY-MM-DD format. (currently parsed as `new Date(str);`)
+* `start`~ is the date/time of the leftmost date/time on the axis.
+* `end`~ is the date/time of the rightmost date/time on the axis.
+* `num_ticks`~ controls the number of tickmarks along the axis between the `start` and `end` date/times (inclusive).  If this field is not present, no tickmarks will be generated except for those at the `start` and `end` dates.
+* `tick_format`~ is unimplemented
+* `callouts` are events on the timeline.
+* `eras` are (?shaded) areas on the timeline.
 
 
-#### Optional Fields
-
-* `num_ticks` controls the number of tickmarks along the axis between the `start` and `end` date/times (inclusive).  If this field is not present, no tickmarks will be generated except for those at the `start` and `end` dates.
-* `tick_format` is unimplemented
-* `callouts` list of events: [[description, date, ?color],...]
-* `eras` [[name, start, end, ?color],...]
+## License
 
 MIT licensed
