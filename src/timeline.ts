@@ -143,6 +143,8 @@ interface LabelKW {
 //
 //
 
+type Info = [string, string];// event, color
+
 class Timeline {
 
     public readonly data: TimelineDataV2;
@@ -441,24 +443,14 @@ class Timeline {
 
     }
 
-    /**
-     *
-     * @returns {number} min_y ?
-     */
-    createCallouts(): number {
+    //
 
-        type Info = [string, string];
+    //pure fn
+    //sub fn createCallouts()
+    static sortCallouts(calloutsData: TimelineCalloutV2[]): [number[], Map<number, Info[]>] {
 
-        let minY = Infinity;
-        if (!('callouts' in this.data)) {
-            return;//undefined
-        }
-        const calloutsData: TimelineCalloutV2[] = this.data.callouts;
-
-        //# sort callouts
-        const sortedDates: Array<number> = [];
-        const invCallouts: Map<number, Array<Info>> = new Map();
-
+        const sortedDates: number[] = [];
+        const eventsByDate: Map<number, Info[]> = new Map();
         for (let callout of calloutsData) {
 
             const tmp: string = callout.date;
@@ -468,23 +460,64 @@ class Timeline {
             const eventColor: string = callout.color || Colors.black;
 
             sortedDates.push(eventDate);
-            if (!( invCallouts.has(eventDate))) {
-                invCallouts.set(eventDate, []);// [event_date] = []
+            if (!( eventsByDate.has(eventDate))) {
+                eventsByDate.set(eventDate, []);// [event_date] = []
             }
             const newInfo: Info = [event, eventColor];
-            const events: Array<Info> = invCallouts.get(eventDate);
+            const events: Array<Info> = eventsByDate.get(eventDate);
             events.push(newInfo);
 
         }
         sortedDates.sort();
 
+        return [sortedDates, eventsByDate];
+    }
+
+    //not pure fn
+    //sub fn createCallouts()
+    calculateCalloutHeight(x: number, prevX: number[], prevLevel: number[], event: string): number {
+        let level: number = 0;
+        let i: number = prevX.length - 1;
+
+        const left: number = x - (Timeline.getTextMetrics('Helevetica', 6, event)[0]
+            + this.calloutProperties.width + this.textFudge[0]);
+
+        while (left < prevX[i] && i >= 0) {
+            level = Math.max(level, prevLevel[i] + 1);
+            i -= 1;
+        }
+
+        const calloutHeight = level * this.calloutProperties.increment;
+
+        prevX.push(x);
+        prevLevel.push(level);
+
+        return calloutHeight;
+    }
+
+    //
+
+    /**
+     *
+     * @returns {number} min_y ?
+     */
+    createCallouts(): number {
+        if (!('callouts' in this.data)) {
+            return;//undefined
+        }
+        //type Info = [string, string];// event, color
+
+        //# sort callouts
+        const [sortedDates, eventsByDate]:
+            [number[], Map<number, Info[]>] = Timeline.sortCallouts(this.data.callouts);
 
         //# add callouts, one by one, making sure they don't overlap
-        let prevX = [-Infinity];
-        let prevLevel = [-1];
-        for (let eventDate of sortedDates) {
-            const [event, eventColor]:Info = invCallouts.get(eventDate).pop();
+        let prevX: number[] = [-Infinity];
+        let prevLevel: number[] = [-1];
+        let minY = Infinity;
 
+        // for each callout
+        for (let eventDate of sortedDates) {
 
             const numSeconds: number = (eventDate - this.date0) / 1000;
             const percentWidth: number = numSeconds / this.totalSeconds;
@@ -492,31 +525,21 @@ class Timeline {
                 continue;
             }
 
+            const [event, eventColor]:Info = eventsByDate.get(eventDate).pop();
+
+            // positioning
             const x: number = Math.trunc(percentWidth * this.width + 0.5);
-
             //# figure out what 'level" to make the callout on
-            let k: number = 0;
-            let i: number = prevX.length - 1;
-
-            const left: number = x - (Timeline.getTextMetrics('Helevetica', 6, event)[0]
-                + this.calloutProperties.width + this.textFudge[0]);
-
-            while (left < prevX[i] && i >= 0) {
-                k = Math.max(k, prevLevel[i] + 1);
-                i -= 1;
-            }
-
-            const y: number = 0 - this.calloutProperties.height -
-                k * this.calloutProperties.increment;
+            const calloutHeight: number = this.calculateCalloutHeight(x, prevX, prevLevel, event);
+            const y: number = 0 - this.calloutProperties.height - calloutHeight;
             minY = Math.min(minY, y);
 
-            //path_data = 'M%i,%i L%i,%i L%i,%i'
-            // % (x, 0, x, y, x - self.callout_size[0], y)
-            const pathData: string = 'M' + x + ',' + 0 + ' L' + x + ',' + y + ' L'
-                + (x - this.calloutProperties.width) + ',' + y;
-
+            //svg elements
+            const pathData: string = ['M', x, ',', 0, ' L', x, ',', y, ' L',
+                (x - this.calloutProperties.width), ',', y].join("");
             const pth = this.drawing.path(pathData).stroke({color: eventColor, width: 1});//fill none?
             pth.fill("white", 0);//nothing
+
             this.axisGroup.add(pth);
 
             const txt = this.drawing.text(event);
@@ -533,16 +556,8 @@ class Timeline {
 
             //XXX white is transparent?
             const circ = this.drawing.circle(8).attr({fill: 'white', cx: x, cy: 0, stroke: eventColor});//this.drawing.circle(8);
-            //circ.cx(x).cy(0);
-            //circ.fill('#e2e', 0.5);
-            //circ.stroke({color: event_color});
-
 
             this.axisGroup.add(circ);
-
-            prevX.push(x);
-            prevLevel.push(k);
-
 
         }
 
