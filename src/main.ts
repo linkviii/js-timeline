@@ -1,8 +1,13 @@
-let draw = SVG('drawing')//.size(300, 300);
-let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
+/*
+ * Demonstrate the use of the timeline library.
+ *
+ * MIT licenced.
+ *
+ */
 
-//
+//console.log(Date());
 
+// read a file the "wrong" way
 function loadData(filename: string): any {
     return (function () {
         let json = null;
@@ -20,7 +25,11 @@ function loadData(filename: string): any {
 
 }
 
-//
+// test svg library
+let draw = SVG('drawing');//.size(300, 300);
+let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
+
+// test timelines
 
 const sample = "res/simple_timeline.json";
 const anime = "res/no.json";
