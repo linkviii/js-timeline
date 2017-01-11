@@ -77,6 +77,10 @@ interface TimelineDataV2 {
 * `eras` are (?shaded) areas on the timeline.
 
 
+## Dependencies 
+* jquery
+* [svg.js](http://svgjs.com/): © 2012 - 2016 Wout Fierens - svg.js is released under the terms of the MIT license.  
+
 ## License
 
 MIT licensed
