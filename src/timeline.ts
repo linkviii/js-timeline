@@ -5,7 +5,7 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 2017-1-7 *
+ * v 2017-1-25
  *   (Try to change with new features. Not strict.)
  * 
  * MIT licenced
@@ -22,7 +22,7 @@ function p(o: any): void {
     console.log(o);
 }
 
-/**
+/*
  * Interface of controlling json
  * start/end YYYY-MM-DD (currently `new Date(str);`)
  */
@@ -205,7 +205,7 @@ class Timeline {
 
         this.calloutProperties = {width: 10, height: 15, increment: 10};
 
-        this.textFudge = [3, 1.5];
+        this.textFudge = [3, 1.5]; //w, h?
         // TODO use
         this.tickFormat = this.data.tickFormat;
 
@@ -438,7 +438,7 @@ class Timeline {
 
         this.axisGroup.add(txt);
 
-        const h = Timeline.getTextMetrics('Helevetica', 6, label)[0] + 2 * dy;
+        const h = Timeline.getTextWidth('Helevetica', 6, label) + 2 * dy;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
 
     }
@@ -475,17 +475,25 @@ class Timeline {
 
     //not pure fn
     //sub fn createCallouts()
+    //modifies prev~
     calculateCalloutHeight(x: number, prevX: number[], prevLevel: number[], event: string): number {
         let level: number = 0;
-        let i: number = prevX.length - 1;
+        //let i: number = prevX.length - 1;
 
-        const left: number = x - (Timeline.getTextMetrics('Helevetica', 6, event)[0]
-            + this.calloutProperties.width + this.textFudge[0]);
+        //ensure text does not overlap with previous entries
+        const adjustment: number = 0; //XXX
+        const textWidth: number = Timeline.getTextWidth('Helevetica', 6, event) - adjustment;
+        const left: number = x - (textWidth + this.calloutProperties.width + this.textFudge[0]);
 
-        while (left < prevX[i] && i >= 0) {
+        for (let i = prevX.length - 1; left < prevX[i] && i >= 0; i--) {
+            if (i < 0) console.log(event)
             level = Math.max(level, prevLevel[i] + 1);
-            i -= 1;
         }
+
+        // while (left < prevX[i] && i >= 0) {
+        //     level = Math.max(level, prevLevel[i] + 1);
+        //     i -= 1;
+        // }
 
         const calloutHeight = level * this.calloutProperties.increment;
 
@@ -565,15 +573,17 @@ class Timeline {
 
     }
 
-    static getTextMetrics(family: string, size: number, text: string): [number, number] {
 
+    static getTextWidth(family: string, size: number, text: string): number {
+        //use canvas to measure text width
         const c: any = document.getElementById("dummyCanvas");
         const ctx = c.getContext("2d");
-        ctx.font = size + " " + family;
+        ctx.font = size + "pt " + family;
         const w = ctx.measureText(text).width;
-        const h = size; //TODO ?? #font.metrics("linespace")
-        return [w, h];
+
+        return w;
     }
+
 
 }
 
