@@ -5,11 +5,23 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 2017-1-25
+ * v 2017-1-26
  *   (Try to change with new features. Not strict.)
  * 
  * MIT licenced
  */
+
+
+//Util
+function max<T>(x: T, y: T, fn: (val: T) => number): T {
+    if (fn(x) > fn(y)) {
+        return x;
+    } else {
+        return y;
+    }
+}
+
+//
 
 
 /**
@@ -23,10 +35,11 @@ function p(o: any): void {
 }
 
 /*
- * Interface of controlling json
+ * Interfaces of controlling json
  * start/end YYYY-MM-DD (currently `new Date(str);`)
+ * V2 is prefered
  */
-//Base interface is useless
+
 type TimelineData = TimelineDataV1 | TimelineDataV2;
 
 //v1
@@ -147,6 +160,15 @@ type Info = [string, string];// event, color
 
 class Timeline {
 
+
+    public static readonly calloutProperties: {width: number, height: number, increment: number} = {
+        width: 10,
+        height: 15,
+        increment: 10
+    };
+    public static readonly textFudge: [number, number] = [3, 1.5]; //factor? [?, ?]
+
+
     public readonly data: TimelineDataV2;
 
     public readonly startDate: Date;
@@ -156,15 +178,9 @@ class Timeline {
     public readonly date1: number;
     public readonly totalSeconds: number;
 
-    //public callout_size: [number, number, number];
-    public readonly calloutProperties: {width: number, height: number, increment: number};
 
-
-    public readonly textFudge: [number, number];
     public readonly tickFormat: string;
     public readonly markers;
-
-    //public fonts;
 
     public maxLabelHeight: number;
 
@@ -198,14 +214,7 @@ class Timeline {
         this.date1 = this.endDate.valueOf() + padding;
         this.totalSeconds = (this.date1 - this.date0) / 1000;
 
-        // # set up some params
-        //TODO Cleanup / factor
-        //this.callout_size = [10, 15, 10]; // width, height, increment
 
-
-        this.calloutProperties = {width: 10, height: 15, increment: 10};
-
-        this.textFudge = [3, 1.5]; //w, h?
         // TODO use
         this.tickFormat = this.data.tickFormat;
 
@@ -229,10 +238,10 @@ class Timeline {
         const yCallouts = this.createCallouts();
 
         //# determine axis position so that axis + callouts don't overlap with eras
-        const yAxis: number = yEra + this.calloutProperties.height - yCallouts;
+        const yAxis: number = yEra + Timeline.calloutProperties.height - yCallouts;
 
         //# determine height so that eras, callouts, axis, and labels just fit
-        const height: number = yAxis + this.maxLabelHeight + 4 * this.textFudge[1];
+        const height: number = yAxis + this.maxLabelHeight + 4 * Timeline.textFudge[1];
 
         //# create eras and labels using axis height and overall height
         this.createEras(yEra, yAxis, height);
@@ -311,11 +320,12 @@ class Timeline {
             /*
              horz['marker-start'] = start_marker.get_funciri()
              horz['marker-end'] = end_marker.get_funciri()
-             self.drawing.add(self.drawing.text(name, insert=(0.5*(x0 + x1), y_era - self.textFudge[1]), stroke='none', fill=fill, font_family="Helevetica", font_size="6pt", text_anchor="middle"))
+             self.drawing.add(self.drawing.text(name, insert=(0.5*(x0 + x1), y_era - self.textFudge[1]), stroke='none',
+             ````fill=fill, font_family="Helevetica", font_size="6pt", text_anchor="middle"))
              */
             const txt = this.drawing.text(name);
             txt.font({family: 'Helevetica', size: '6pt', anchor: 'middle'});
-            txt.dx(0.5 * (x0 + x1)).dy(yEra - this.textFudge[1]);
+            txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1]);
             txt.fill(fill);
 
             this.drawing.add(txt);
@@ -473,17 +483,35 @@ class Timeline {
         return [sortedDates, eventsByDate];
     }
 
-    //not pure fn
-    //sub fn createCallouts()
-    //modifies prev~
-    calculateCalloutHeight(eventEndpoint: number, prevEndpoints: number[], prevLevels: number[], event: string): number {
-        let level: number = 0;
-        let i: number = prevEndpoints.length - 1;
+    /**
+     *
+     * @param str
+     * @returns {any}
+     */
+    static bifercateString(str: string): [string, string] | null {
+        const cuttingRangeStart = Math.floor(str.length * 0.33);
+        const cuttingRangeEnd = str.length * 0.66;
 
-        //ensure text does not overlap with previous entries
-        const adjustment: number = 0; //XXX
-        const textWidth: number = Timeline.getTextWidth('Helevetica', 6, event) - adjustment;
-        const leftBoundary: number = eventEndpoint - (textWidth + this.calloutProperties.width + this.textFudge[0]);
+        let maxCutPoint = 0;
+        for (let i = cuttingRangeStart; i < cuttingRangeEnd; i++) {
+            if (str[i] == " ") {
+                maxCutPoint = i;
+            }
+        }
+        if (maxCutPoint != 0) {
+            return [str.slice(0, maxCutPoint), str.slice(maxCutPoint + 1, str.length - 1)];
+        } else {
+            return null;
+        }
+
+    }
+
+
+    //pure fn
+    static calculateCalloutLevel(leftBoundary: number, prevEndpoints: number[], prevLevels: number[]): number {
+
+        let i: number = prevEndpoints.length - 1;
+        let level: number = 0;
 
 
         // Given previous endpoints within the span of event's bounds,
@@ -497,12 +525,55 @@ class Timeline {
             i -= 1;
         }
 
-        const calloutHeight = level * this.calloutProperties.increment;
+        return level;
+    }
+
+    static calculateEventLeftBondary(event: string, eventEndpoint: number): number {
+        //const adjustment: number = 0; //XXX
+        const textWidth: number = Timeline.getTextWidth('Helevetica', 6, event);// - adjustment;
+        //const leftBoundary: number =
+        return eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+    }
+
+    //not pure fn
+    //sub fn createCallouts()
+    //modifies prev*
+    static calculateCalloutHeight(eventEndpoint: number, prevEndpoints: number[], prevLevels: number[], event: string): [number, string] {
+
+
+        //ensure text does not overlap with previous entries
+
+        const leftBoundary: number = Timeline.calculateEventLeftBondary(event, eventEndpoint);
+
+        let level: number = Timeline.calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels);
+
+        //TODO Compare against bifracated areas
+
+        const bif = Timeline.bifercateString(event);
+        if (bif) {
+
+            //longest of 2 stings
+            const bifEvent: string = max(bif[0], bif[1], function (val) {
+                return val.length;
+            });
+            const bifBondary: number = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
+            // occupying 2 lines → +1
+            const bifLevel: number = Timeline.calculateCalloutLevel(bifBondary, prevEndpoints, prevLevels) + 1;
+            //compare levels somehow
+
+            if (bifLevel < level) {
+                level = bifLevel;
+                event = bif.join("\n")
+            }
+        }
+
+
+        const calloutHeight = level * Timeline.calloutProperties.increment;
 
         prevEndpoints.push(eventEndpoint);
         prevLevels.push(level);
 
-        return calloutHeight;
+        return [calloutHeight, event];
     }
 
     //
@@ -535,26 +606,26 @@ class Timeline {
                 continue;
             }
 
-            const [event, eventColor]:Info = eventsByDate.get(eventDate).pop();
+            const [rawEvent, eventColor]:Info = eventsByDate.get(eventDate).pop();
 
             // positioning
             const x: number = Math.trunc(percentWidth * this.width + 0.5);
             //# figure out what 'level" to make the callout on
-            const calloutHeight: number = this.calculateCalloutHeight(x, prevX, prevLevel, event);
-            const y: number = 0 - this.calloutProperties.height - calloutHeight;
+            const [calloutHeight, event]: [number, string] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, rawEvent);
+            const y: number = 0 - Timeline.calloutProperties.height - calloutHeight;
             minY = Math.min(minY, y);
 
             //svg elements
             const pathData: string = ['M', x, ',', 0, ' L', x, ',', y, ' L',
-                (x - this.calloutProperties.width), ',', y].join("");
+                (x - Timeline.calloutProperties.width), ',', y].join("");
             const pth = this.drawing.path(pathData).stroke({color: eventColor, width: 1});//fill none?
             pth.fill("white", 0);//nothing
 
             this.axisGroup.add(pth);
 
             const txt = this.drawing.text(event);
-            txt.dx(x - this.calloutProperties.width - this.textFudge[0]);
-            txt.dy(y - 4 * this.textFudge[1]);
+            txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);
+            txt.dy(y - 4 * Timeline.textFudge[1]);
             txt.font({family: 'Helevetica', size: '6pt', anchor: 'end'});
             txt.fill(eventColor);
 
@@ -565,7 +636,7 @@ class Timeline {
                 {tick: false, fill: Colors.black});
 
             //XXX white is transparent?
-            const circ = this.drawing.circle(8).attr({fill: 'white', cx: x, cy: 0, stroke: eventColor});//this.drawing.circle(8);
+            const circ = this.drawing.circle(8).attr({fill: 'white', cx: x, cy: 0, stroke: eventColor});
 
             this.axisGroup.add(circ);
 
