@@ -32,7 +32,7 @@ let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
 // test timelines
 
 const sample = "res/simple_timeline.json";
-const anime = "res/no.json";
+const anime = "res/animev2.json";
 
 
 const foo: TimelineData = loadData(sample);
