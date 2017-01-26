@@ -476,29 +476,31 @@ class Timeline {
     //not pure fn
     //sub fn createCallouts()
     //modifies prev~
-    calculateCalloutHeight(x: number, prevX: number[], prevLevel: number[], event: string): number {
+    calculateCalloutHeight(eventEndpoint: number, prevEndpoints: number[], prevLevels: number[], event: string): number {
         let level: number = 0;
-        //let i: number = prevX.length - 1;
+        let i: number = prevEndpoints.length - 1;
 
         //ensure text does not overlap with previous entries
         const adjustment: number = 0; //XXX
         const textWidth: number = Timeline.getTextWidth('Helevetica', 6, event) - adjustment;
-        const left: number = x - (textWidth + this.calloutProperties.width + this.textFudge[0]);
+        const leftBoundary: number = eventEndpoint - (textWidth + this.calloutProperties.width + this.textFudge[0]);
 
-        for (let i = prevX.length - 1; left < prevX[i] && i >= 0; i--) {
-            if (i < 0) console.log(event)
-            level = Math.max(level, prevLevel[i] + 1);
+
+        // Given previous endpoints within the span of event's bounds,
+        // find the highest level needed to not overlap,
+        // starting with the closest endpoints.
+        //~`for i = prevEndpoints.length - 1; i--`
+        //left boundary < a prev endpoint → intersection
+        //    → higher level needed than the level of intersected endpoint
+        while (leftBoundary < prevEndpoints[i] && i >= 0) {
+            level = Math.max(level, prevLevels[i] + 1);
+            i -= 1;
         }
-
-        // while (left < prevX[i] && i >= 0) {
-        //     level = Math.max(level, prevLevel[i] + 1);
-        //     i -= 1;
-        // }
 
         const calloutHeight = level * this.calloutProperties.increment;
 
-        prevX.push(x);
-        prevLevel.push(level);
+        prevEndpoints.push(eventEndpoint);
+        prevLevels.push(level);
 
         return calloutHeight;
     }
