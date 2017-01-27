@@ -5,7 +5,7 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 2017-1-26
+ * v 2017-1-26*
  *   (Try to change with new features. Not strict.)
  *
  * MIT licenced
@@ -414,8 +414,7 @@ class Timeline {
     }
     static getTextWidth(family, size, text) {
         //use canvas to measure text width
-        const c = document.getElementById("dummyCanvas");
-        const ctx = c.getContext("2d");
+        const ctx = Timeline.canvas.getContext("2d");
         ctx.font = size + "pt " + family;
         const w = ctx.measureText(text).width;
         return w;
@@ -427,4 +426,5 @@ Timeline.calloutProperties = {
     increment: 10
 };
 Timeline.textFudge = [3, 1.5]; //factor? [?, ?]
+Timeline.canvas = document.createElement('canvas');
 //# sourceMappingURL=timeline.js.map
