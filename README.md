@@ -32,7 +32,7 @@ interface TimelineDataV1 {
     eras?: TimelineEraV1[];
 }
 ```
-See `res/simple_timeline.json` for an example.
+See [res/simple_timeline.json](res/simple_timeline.json) for an example.
 
 ### Interface v2
 New interface:
@@ -52,7 +52,7 @@ interface TimelineEraV2 {
 }
 
 interface TimelineDataV2 {
-    apiVersion: number; //2
+    apiVersion: 2; 
     width: number;
     startDate: string;
     endDate: string;
@@ -65,6 +65,8 @@ interface TimelineDataV2 {
 
 **Required**: `apiVersion: 2`
 
+See [res/animev2.json](res/animev2.json) for an example.
+
 ### Interface notes
 * `colors` are hex strings.
 * `width` describes the width, in pixels, of the output SVG document.  The height will be determined automatically.
@@ -76,6 +78,9 @@ interface TimelineDataV2 {
 * `callouts` are events on the timeline.
 * `eras` are (?shaded) areas on the timeline.
 
+## Version
+* **`apiVersion`** changes in response to changes in the json's interface.
+* **Library** version can be found at the top of [src/timeline.ts](src/timeline.ts). The version is (not strictly) the date that the last feature change was made. Code pushed on the `gh-pages` (master) branch should never be broken.
 
 ## Dependencies 
 * jquery
