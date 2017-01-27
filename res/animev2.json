@@ -5,10 +5,6 @@
   "endDate": "2016-05-24",
   "callouts": [
     {
-      "description": "Neon Genesis Evangelion",
-      "date": "2017-01-14"
-    },
-    {
       "description": "Started Fullmetal Alchemist",
       "date": "2016-04-08",
       "color": "#C0C0FF"
@@ -29,10 +25,6 @@
       "color": "#CD3F85"
     },
     {
-      "description": "Bleach",
-      "date": "2012-04-01"
-    },
-    {
       "description": "Started Noir",
       "date": "2016-01-07",
       "color": "#C0C0FF"
@@ -43,72 +35,12 @@
       "color": "#CD3F85"
     },
     {
-      "description": "Fate/stay night",
-      "date": "2015-12-10"
-    },
-    {
       "description": "Fullmetal Alchemist: The Conqueror of Shamballa",
       "date": "2016-04-23"
     },
     {
-      "description": "Higurashi no Naku Koro ni",
-      "date": "2015-11-26"
-    },
-    {
       "description": "Death Note",
       "date": "2016-01-02"
-    },
-    {
-      "description": "Clannad Movie",
-      "date": "2015-12-24"
-    },
-    {
-      "description": "Higurashi no Naku Koro ni Kai",
-      "date": "2015-12-01"
-    },
-    {
-      "description": "Clannad",
-      "date": "2015-12-24"
-    },
-    {
-      "description": "Higurashi no Naku Koro ni Special: Nekogoroshi-hen",
-      "date": "2015-11-26"
-    },
-    {
-      "description": "Higurashi no Naku Koro ni Rei",
-      "date": "2015-12-02"
-    },
-    {
-      "description": "Clannad: Mou Hitotsu no Sekai, Tomoyo-hen",
-      "date": "2015-12-24"
-    },
-    {
-      "description": "Clannad: After Story",
-      "date": "2015-12-30"
-    },
-    {
-      "description": "Druaga no Tou: The Sword of Uruk",
-      "date": "2015-09-18"
-    },
-    {
-      "description": "Umineko no Naku Koro ni",
-      "date": "2015-12-07"
-    },
-    {
-      "description": "ChäoS;HEAd",
-      "date": "2015-09-29"
-    },
-    {
-      "description": "Fullmetal Alchemist: Brotherhood",
-      "date": "2016-12-25"
-    },
-    {
-      "description": "Clannad: After Story - Mou Hitotsu no Sekai, Kyou-hen",
-      "date": "2015-12-30"
-    },
-    {
-      "description": "Angel Beats!",
-      "date": "2015-11-08"
     },
     {
       "description": "Started Durarara!!",
@@ -121,18 +53,6 @@
       "color": "#CD3F85"
     },
     {
-      "description": "Fate/stay night Movie: Unlimited Blade Works",
-      "date": "2015-12-11"
-    },
-    {
-      "description": "Steins;Gate",
-      "date": "2015-09-22"
-    },
-    {
-      "description": "Mahou Shoujo Madoka★Magica",
-      "date": "2015-12-22"
-    },
-    {
       "description": "Started Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
       "date": "2016-03-27",
       "color": "#C0C0FF"
@@ -141,18 +61,6 @@
       "description": "finished Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
       "date": "2016-04-05",
       "color": "#CD3F85"
-    },
-    {
-      "description": "Fate/Zero",
-      "date": "2015-12-08"
-    },
-    {
-      "description": "Higurashi no Naku Koro ni Kira",
-      "date": "2015-12-02"
-    },
-    {
-      "description": "Steins;Gate: Oukoubakko no Poriomania",
-      "date": "2015-09-24"
     },
     {
       "description": "Inu x Boku SS",
@@ -169,32 +77,8 @@
       "color": "#CD3F85"
     },
     {
-      "description": "Steins;Gate Movie: Fuka Ryouiki no Déjà vu",
-      "date": "2015-09-23"
-    },
-    {
-      "description": "Fate/Zero 2nd Season",
-      "date": "2015-12-09"
-    },
-    {
-      "description": "Mahou Shoujo Madoka★Magica Movie 3: Hangyaku no Monogatari",
-      "date": "2015-12-22"
-    },
-    {
-      "description": "Robotics;Notes",
-      "date": "2015-11-05"
-    },
-    {
       "description": "Hentai Ouji to Warawanai Neko.",
       "date": "2016-01-04"
-    },
-    {
-      "description": "Higurashi no Naku Koro ni Kaku: Outbreak",
-      "date": "2015-12-01"
-    },
-    {
-      "description": "Log Horizon",
-      "date": "2016-06-29"
     },
     {
       "description": "Started Grisaia no Kajitsu",
@@ -217,10 +101,6 @@
       "color": "#CD3F85"
     },
     {
-      "description": "D-Frag!",
-      "date": "2015-12-23"
-    },
-    {
       "description": "Started Noragami",
       "date": "2016-03-07",
       "color": "#C0C0FF"
@@ -241,14 +121,6 @@
       "color": "#CD3F85"
     },
     {
-      "description": "Fate/stay night: Unlimited Blade Works",
-      "date": "2015-12-13"
-    },
-    {
-      "description": "D-Frag! OVA",
-      "date": "2015-12-23"
-    },
-    {
       "description": "Started Hitsugi no Chaika: Avenging Battle",
       "date": "2016-03-25",
       "color": "#C0C0FF"
@@ -261,14 +133,6 @@
     {
       "description": "Trinity Seven",
       "date": "2016-03-05"
-    },
-    {
-      "description": "Fate/stay night: Unlimited Blade Works - Prologue",
-      "date": "2015-12-11"
-    },
-    {
-      "description": "Steins;Gate: Soumei Eichi no Cognitive Computing",
-      "date": "2015-09-25"
     },
     {
       "description": "Trinity Seven OVA",
@@ -285,16 +149,8 @@
       "color": "#CD3F85"
     },
     {
-      "description": "Fate/stay night: Unlimited Blade Works 2nd Season",
-      "date": "2015-12-15"
-    },
-    {
       "description": "Gate: Jieitai Kanochi nite, Kaku Tatakaeri",
       "date": "2016-02-07"
-    },
-    {
-      "description": "Charlotte",
-      "date": "2015-11-19"
     },
     {
       "description": "Grisaia no Meikyuu: Caprice no Mayu 0",
