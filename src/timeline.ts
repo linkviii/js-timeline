@@ -72,7 +72,7 @@ interface TimelineEraV2 {
 }
 
 interface TimelineDataV2 {
-    apiVersion: number; //2
+    apiVersion: 2;
     width: number;
     startDate: string;
     endDate: string;
@@ -82,9 +82,8 @@ interface TimelineDataV2 {
     eras?: TimelineEraV2[];
 }
 
-function convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
-
-    function convertCallouts(oldCallouts: TimelineCalloutV1[]): TimelineCalloutV2[] {
+class TimelineConverter {
+    static convertCallouts(oldCallouts: TimelineCalloutV1[]): TimelineCalloutV2[] {
         const callouts: TimelineCalloutV2[] = [];
 
         for (let oldCallout of oldCallouts) {
@@ -100,7 +99,7 @@ function convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
         return callouts;
     }
 
-    function convertEras(oldEras: TimelineEraV1[]): TimelineEraV2[] {
+    static convertEras(oldEras: TimelineEraV1[]): TimelineEraV2[] {
         const eras: TimelineEraV2[] = [];
         for (let oldEra of oldEras) {
             const newEra: TimelineEraV2 = {
@@ -116,31 +115,36 @@ function convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
         return eras;
     }
 
-    const newData: TimelineDataV2 = {
-        apiVersion: 2,
-        width: oldData.width,
-        startDate: oldData.start,
-        endDate: oldData.end
-    };
+   static convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
 
-    // camelCase names
-    if ('num_ticks' in oldData) {
-        newData.numTicks = oldData.num_ticks;
-    }
-    if ('tick_format' in oldData) {
-        newData.tickFormat = oldData.tick_format;
-    }
+        const newData: TimelineDataV2 = {
+            apiVersion: 2,
+            width: oldData.width,
+            startDate: oldData.start,
+            endDate: oldData.end
+        };
 
-    // Convert tuples to objects
-    if ('callouts' in oldData) {
-        newData.callouts = convertCallouts(oldData.callouts);
-    }
-    if ('eras' in oldData) {
-        newData.eras = convertEras(oldData.eras);
-    }
+        // camelCase names
+        if ('num_ticks' in oldData) {
+            newData.numTicks = oldData.num_ticks;
+        }
+        if ('tick_format' in oldData) {
+            newData.tickFormat = oldData.tick_format;
+        }
 
-    return newData;
+        // Convert tuples to objects
+        if ('callouts' in oldData) {
+            newData.callouts = TimelineConverter.convertCallouts(oldData.callouts);
+        }
+        if ('eras' in oldData) {
+            newData.eras = TimelineConverter.convertEras(oldData.eras);
+        }
+
+        return newData;
+    }
 }
+
+
 
 /**
  * addAxisLabel kw
@@ -195,7 +199,7 @@ class Timeline {
         if ((<TimelineDataV2>data).apiVersion == 2) {
             this.data = <TimelineDataV2>data;
         } else {
-            this.data = convertTimelineDataV1ToV2(<TimelineDataV1>data);
+            this.data = TimelineConverter.convertTimelineDataV1ToV2(<TimelineDataV1>data);
         }
 
 

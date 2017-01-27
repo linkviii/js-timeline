@@ -27,8 +27,8 @@ let Colors = { black: '#000000', gray: '#C0C0C0' };
 function p(o) {
     console.log(o);
 }
-function convertTimelineDataV1ToV2(oldData) {
-    function convertCallouts(oldCallouts) {
+class TimelineConverter {
+    static convertCallouts(oldCallouts) {
         const callouts = [];
         for (let oldCallout of oldCallouts) {
             const newCallout = {
@@ -42,7 +42,7 @@ function convertTimelineDataV1ToV2(oldData) {
         }
         return callouts;
     }
-    function convertEras(oldEras) {
+    static convertEras(oldEras) {
         const eras = [];
         for (let oldEra of oldEras) {
             const newEra = {
@@ -57,27 +57,29 @@ function convertTimelineDataV1ToV2(oldData) {
         }
         return eras;
     }
-    const newData = {
-        apiVersion: 2,
-        width: oldData.width,
-        startDate: oldData.start,
-        endDate: oldData.end
-    };
-    // camelCase names
-    if ('num_ticks' in oldData) {
-        newData.numTicks = oldData.num_ticks;
+    static convertTimelineDataV1ToV2(oldData) {
+        const newData = {
+            apiVersion: 2,
+            width: oldData.width,
+            startDate: oldData.start,
+            endDate: oldData.end
+        };
+        // camelCase names
+        if ('num_ticks' in oldData) {
+            newData.numTicks = oldData.num_ticks;
+        }
+        if ('tick_format' in oldData) {
+            newData.tickFormat = oldData.tick_format;
+        }
+        // Convert tuples to objects
+        if ('callouts' in oldData) {
+            newData.callouts = TimelineConverter.convertCallouts(oldData.callouts);
+        }
+        if ('eras' in oldData) {
+            newData.eras = TimelineConverter.convertEras(oldData.eras);
+        }
+        return newData;
     }
-    if ('tick_format' in oldData) {
-        newData.tickFormat = oldData.tick_format;
-    }
-    // Convert tuples to objects
-    if ('callouts' in oldData) {
-        newData.callouts = convertCallouts(oldData.callouts);
-    }
-    if ('eras' in oldData) {
-        newData.eras = convertEras(oldData.eras);
-    }
-    return newData;
 }
 class Timeline {
     // initializes data for timeline
@@ -86,7 +88,7 @@ class Timeline {
             this.data = data;
         }
         else {
-            this.data = convertTimelineDataV1ToV2(data);
+            this.data = TimelineConverter.convertTimelineDataV1ToV2(data);
         }
         this.width = this.data.width;
         this.drawing = SVG(id);
