@@ -377,15 +377,19 @@ class Timeline {
         //# add callouts, one by one, making sure they don't overlap
         let prevX = [-Infinity];
         let prevLevel = [-1];
+        //vertical drawing up is negative ~= max height
         let minY = Infinity;
         // for each callout
         for (let eventDate of sortedDates) {
+            const [rawEvent, eventColor] = eventsByDate.get(eventDate).pop();
             const numSeconds = (eventDate - this.date0) / 1000;
             const percentWidth = numSeconds / this.totalSeconds;
             if (percentWidth < 0 || percentWidth > 1) {
+                const w = ["Skipped callout: ", rawEvent, ". percentWidth: ", percentWidth,
+                    ". Date not in range?"].join("");
+                console.warn(w);
                 continue;
             }
-            const [rawEvent, eventColor] = eventsByDate.get(eventDate).pop();
             // positioning
             const x = Math.trunc(percentWidth * this.width + 0.5);
             //# figure out what 'level" to make the callout on

@@ -115,7 +115,7 @@ class TimelineConverter {
         return eras;
     }
 
-   static convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
+    static convertTimelineDataV1ToV2(oldData: TimelineDataV1): TimelineDataV2 {
 
         const newData: TimelineDataV2 = {
             apiVersion: 2,
@@ -143,7 +143,6 @@ class TimelineConverter {
         return newData;
     }
 }
-
 
 
 /**
@@ -599,18 +598,24 @@ class Timeline {
         //# add callouts, one by one, making sure they don't overlap
         let prevX: number[] = [-Infinity];
         let prevLevel: number[] = [-1];
+        //vertical drawing up is negative ~= max height
         let minY = Infinity;
 
         // for each callout
         for (let eventDate of sortedDates) {
 
+            const [rawEvent, eventColor]:Info = eventsByDate.get(eventDate).pop();
+
+
             const numSeconds: number = (eventDate - this.date0) / 1000;
             const percentWidth: number = numSeconds / this.totalSeconds;
             if (percentWidth < 0 || percentWidth > 1) {
+                const w: string = ["Skipped callout: ", rawEvent, ". percentWidth: ", percentWidth,
+                    ". Date not in range?"].join("");
+                console.warn(w);
                 continue;
             }
 
-            const [rawEvent, eventColor]:Info = eventsByDate.get(eventDate).pop();
 
             // positioning
             const x: number = Math.trunc(percentWidth * this.width + 0.5);
@@ -651,6 +656,7 @@ class Timeline {
     }
 
     static readonly canvas = document.createElement('canvas');
+
     static getTextWidth(family: string, size: number, text: string): number {
         //use canvas to measure text width
 
