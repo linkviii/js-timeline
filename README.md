@@ -4,6 +4,9 @@ Generate svg timelines with javascript. Demo: http://linkviii.github.io/js-timel
 Based on https://github.com/jasonreisman/Timeline written in python. (formated and slightly documented fork: https://github.com/Linkviii/Timeline). Almost compatible with original python implementation.
 
 ```TypeScript
+// typescript import. Compiles to
+// define(["require", "exports", "./src/timeline", "./lib/svgjs"], function (require, exports, timeline_1, SVG) {
+import {Timeline, TimelineData} from "./src/timeline"; 
 const data:TimelineData = ...;
 new Timeline(data, "timelineID").build();
 ```

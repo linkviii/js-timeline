@@ -4,9 +4,17 @@
  * MIT licenced.
  *
  */
-//console.log(Date());
+
+
+import {Timeline, TimelineData} from "./src/timeline";
+
+/// <reference path="lib/svgjs.d.ts"/>
+import * as SVG from "./lib/svgjs";
+
+import * as $ from "jquery";
+
 // read a file the "wrong" way
-function loadData(filename) {
+function loadData(filename: string): any {
     return (function () {
         let json = null;
         $.ajax({
@@ -20,18 +28,24 @@ function loadData(filename) {
         });
         return json;
     })();
+
 }
+
 // test svg library
-let draw = SVG('drawing'); //.size(300, 300);
-let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
+let draw = SVG('drawing');//.size(300, 300);
+let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
+
 // test timelines
+
 const sample = "res/simple_timeline.json";
 const anime = "res/animev2.json";
-const foo = loadData(sample);
-const bar = loadData(anime);
+
+
+const foo: TimelineData = loadData(sample);
+const bar: TimelineData = loadData(anime);
+
 const tl = new Timeline(foo, "sampleTimeline");
 const t2 = new Timeline(bar, "animeTimeline");
 //console.log( tl.data);
 tl.build();
 t2.build();
-//# sourceMappingURL=main.js.map

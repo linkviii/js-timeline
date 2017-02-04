@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
-    "target": "ES2015"
+    "module": "amd",
+    "baseUrl": "./js",
+    "paths": {
+      "jquery":"lib/jquery"
+    }
   },
   "exclude": [
     "node_modules"
   ],
   "files": [
-    "typings/index.d.ts",
-    "src/timeline.ts",
-    "src/main.ts"
+    "js/src/timeline.ts",
+    "js/main.ts"
   ]
 }
