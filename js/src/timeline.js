@@ -402,9 +402,10 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 const pth = this.drawing.path(pathData).stroke({ color: eventColor, width: 1, fill: "none" });
                 pth.fill("none", 0);
                 this.axisGroup.add(pth);
+                const foo = 6;
                 const txt = this.drawing.text(event);
                 txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);
-                txt.dy(y - 4 * Timeline.textFudge[1]);
+                txt.dy(y - 4 * Timeline.textFudge[1] - foo);
                 txt.font({ family: 'Helevetica', size: '6pt', anchor: 'end' });
                 txt.fill(eventColor);
                 this.axisGroup.add(txt);
