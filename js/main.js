@@ -6,6 +6,7 @@
  */
 define(["require", "exports", "./src/timeline", "./lib/svgjs", "jquery"], function (require, exports, timeline_1, SVG, $) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     // read a file the "wrong" way
     function loadData(filename) {
         return (function () {

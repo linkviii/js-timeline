@@ -26,7 +26,7 @@ function max<T>(x: T, y: T, fn: (val: T) => number): T {
 
 //
 
-export const Colors: {black: string, gray: string} = {black: '#000000', gray: '#C0C0C0'};
+export const Colors: { black: string, gray: string } = {black: '#000000', gray: '#C0C0C0'};
 
 //
 
@@ -39,8 +39,8 @@ export const Colors: {black: string, gray: string} = {black: '#000000', gray: '#
 export type TimelineData = TimelineDataV1 | TimelineDataV2;
 
 //v1
-export type TimelineCalloutV1 = [string, string]|[string, string, string];
-export type TimelineEraV1 = [string, string, string]|[string, string, string, string];
+export type TimelineCalloutV1 = [string, string] | [string, string, string];
+export type TimelineEraV1 = [string, string, string] | [string, string, string, string];
 export interface TimelineDataV1 {
     width: number;
     start: string;
@@ -160,7 +160,7 @@ type Info = [string, string];// event, color
 export class Timeline {
 
 
-    public static readonly calloutProperties: {width: number, height: number, increment: number} = {
+    public static readonly calloutProperties: { width: number, height: number, increment: number } = {
         width: 10,
         height: 15,
         increment: 10
@@ -325,7 +325,7 @@ export class Timeline {
              */
             const txt = this.drawing.text(name);
             txt.font({family: 'Helevetica', size: '6pt', anchor: 'middle'});
-            txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1]);
+            txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1] - 9);
             txt.fill(fill);
 
             this.drawing.add(txt);
@@ -400,7 +400,7 @@ export class Timeline {
 
 
     //def addAxisLabel(self, dt, label, **kwargs):
-    private  addAxisLabel(dt: Date, label: string, kw?: LabelKW) {
+    private addAxisLabel(dt: Date, label: string, kw?: LabelKW) {
         //date, string?
         kw = kw || {};
 
@@ -623,8 +623,8 @@ export class Timeline {
             //svg elements
             const pathData: string = ['M', x, ',', 0, ' L', x, ',', y, ' L',
                 (x - Timeline.calloutProperties.width), ',', y].join("");
-            const pth = this.drawing.path(pathData).stroke({color: eventColor, width: 1});//fill none?
-            pth.fill("white", 0);//nothing
+            const pth = this.drawing.path(pathData).stroke({color: eventColor, width: 1, fill:"none"});
+            pth.fill("none", 0);
 
             this.axisGroup.add(pth);
 

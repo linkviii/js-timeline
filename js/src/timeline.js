@@ -12,6 +12,7 @@
  */
 define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     //Util
     function max(x, y, fn) {
         if (fn(x) > fn(y)) {
@@ -169,7 +170,7 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                  */
                 const txt = this.drawing.text(name);
                 txt.font({ family: 'Helevetica', size: '6pt', anchor: 'middle' });
-                txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1]);
+                txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1] - 9);
                 txt.fill(fill);
                 this.drawing.add(txt);
             } //end era loop
@@ -233,6 +234,9 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
             //date, string?
             kw = kw || {};
             if (this.tickFormat) {
+                //##label = dt[0].strftime(self.tickFormat)
+                // label = dt
+                //TODO tick format
             }
             const percentWidth = (dt.valueOf() - this.date0) / 1000 / this.totalSeconds;
             if (percentWidth < 0 || percentWidth > 1) {
@@ -395,8 +399,8 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 //svg elements
                 const pathData = ['M', x, ',', 0, ' L', x, ',', y, ' L',
                     (x - Timeline.calloutProperties.width), ',', y].join("");
-                const pth = this.drawing.path(pathData).stroke({ color: eventColor, width: 1 }); //fill none?
-                pth.fill("white", 0); //nothing
+                const pth = this.drawing.path(pathData).stroke({ color: eventColor, width: 1, fill: "none" });
+                pth.fill("none", 0);
                 this.axisGroup.add(pth);
                 const txt = this.drawing.text(event);
                 txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);

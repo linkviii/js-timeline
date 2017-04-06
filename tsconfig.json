@@ -3,10 +3,7 @@
     "target": "es6",
     "sourceMap": true,
     "module": "amd",
-    "baseUrl": "./js",
-    "paths": {
-      "jquery":"lib/jquery"
-    }
+    "baseUrl": "./js"
   },
   "exclude": [
     "node_modules"
