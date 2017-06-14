@@ -24,7 +24,7 @@ function max<T>(x: T, y: T, fn: (val: T) => number): T {
     }
 }
 
-function maxString(a: string, b: string):string {
+function maxString(a: string, b: string): string {
     return max(a, b, function (val) {
         return val.length;
     });
@@ -84,6 +84,7 @@ export interface TimelineDataV2 {
     eras?: TimelineEraV2[];
 }
 
+//probably "shouldn't" be a class but whatever. converter namespace
 export class TimelineConverter {
     public static convertCallouts(oldCallouts: TimelineCalloutV1[]): TimelineCalloutV2[] {
         const callouts: TimelineCalloutV2[] = [];
@@ -147,6 +148,11 @@ export class TimelineConverter {
 }
 
 
+//
+//
+//
+
+
 /**
  * addAxisLabel kw
  */
@@ -156,12 +162,6 @@ interface LabelKW {
     fill?: string;
 }
 
-
-//
-//
-//
-
-type Info = [string, string];// event, color
 
 export class Timeline {
 
@@ -405,8 +405,7 @@ export class Timeline {
     }
 
 
-    //def addAxisLabel(self, dt, label, **kwargs):
-    private addAxisLabel(dt: Date, label: string, kw?: LabelKW):void {
+    private addAxisLabel(dt: Date, label: string, kw?: LabelKW): void {
         //date, string?
         kw = kw || {};
 
@@ -459,36 +458,20 @@ export class Timeline {
 
     }
 
-    //
 
-    //pure fn
     //sub fn createCallouts()
-    private static sortCallouts(calloutsData: TimelineCalloutV2[]): [number[], Map<number, Info[]>] {
+    private sortCallouts(): void {
+        this.data.callouts.sort(function (a, b) {
+            const tmpA: string = a.date;
+            const eventDateA: number = (new Date(tmpA)).valueOf();
 
-        const sortedDates: number[] = [];
-        const eventsByDate: Map<number, Info[]> = new Map();
-        for (let callout of calloutsData) {
+            const tmpB: string = b.date;
+            const eventDateB: number = (new Date(tmpB)).valueOf();
 
-            const tmp: string = callout.date;
-            const eventDate: number = (new Date(tmp)).valueOf();
+            return eventDateA - eventDateB;
 
-            const event: string = callout.description;
-            const eventColor: string = callout.color || Colors.black;
+        });
 
-            sortedDates.push(eventDate);
-            if (!( eventsByDate.has(eventDate))) {
-                eventsByDate.set(eventDate, []);// [event_date] = []
-            }
-            const newInfo: Info = [event, eventColor];
-
-            //get and modify reference
-            const events: Array<Info> = eventsByDate.get(eventDate);
-            events.push(newInfo);
-
-        }
-        sortedDates.sort();
-
-        return [sortedDates, eventsByDate];
     }
 
     /**
@@ -602,13 +585,10 @@ export class Timeline {
      */
     private createCallouts(): number {
         if (!('callouts' in this.data)) {
-            return;//undefined
+            return;//undefined todo type
         }
-        //type Info = [string, string];// event, color
 
-        //# sort callouts
-        const [sortedDates, eventsByDate]:
-            [number[], Map<number, Info[]>] = Timeline.sortCallouts(this.data.callouts);
+        this.sortCallouts();
 
         //# add callouts, one by one, making sure they don't overlap
         let prevX: number[] = [-Infinity];
@@ -616,16 +596,19 @@ export class Timeline {
         //vertical drawing up is negative ~= max height
         let minY = Infinity;
 
-        // for each callout
-        for (let eventDate of sortedDates) {
 
-            const [rawEvent, eventColor]:Info = eventsByDate.get(eventDate).pop();
+        for (let callout of this.data.callouts) {
 
+            const eventColor: string = callout.color || Colors.black;
 
-            const numSeconds: number = (eventDate - this.date0) / 1000;
+            const calloutDate: Date = new Date(callout.date);
+            const calloutDateValue: number = calloutDate.valueOf();
+
+            const numSeconds: number = (calloutDateValue - this.date0) / 1000;
             const percentWidth: number = numSeconds / this.totalSeconds;
+
             if (percentWidth < 0 || percentWidth > 1) {
-                const w: string = ["Skipped callout: ", rawEvent, ". percentWidth: ", percentWidth,
+                const w: string = ["Skipped callout: ", callout.description, ". percentWidth: ", percentWidth,
                     ". Date not in range?"].join("");
                 console.warn(w);
                 continue;
@@ -635,7 +618,7 @@ export class Timeline {
             // positioning
             const x: number = Math.trunc(percentWidth * this.width + 0.5);
             //# figure out what 'level" to make the callout on
-            const [calloutHeight, event]: [number, string] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, rawEvent);
+            const [calloutHeight, event]: [number, string] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
             const y: number = 0 - Timeline.calloutProperties.height - calloutHeight;
             minY = Math.min(minY, y);
 
@@ -657,11 +640,10 @@ export class Timeline {
 
             this.axisGroup.add(txt);
 
-            const eDate: Date = new Date(eventDate);
-            this.addAxisLabel(eDate, eDate.toLocaleString(),
+
+            this.addAxisLabel(calloutDate, calloutDate.toLocaleString(),
                 {tick: false, fill: Colors.black});
 
-            //XXX white is transparent?
             const circ = this.drawing.circle(8).attr({fill: 'white', cx: x, cy: 0, stroke: eventColor});
 
             this.axisGroup.add(circ);

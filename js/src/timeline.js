@@ -29,6 +29,7 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
     }
     //
     exports.Colors = { black: '#000000', gray: '#C0C0C0' };
+    //probably "shouldn't" be a class but whatever. converter namespace
     class TimelineConverter {
         static convertCallouts(oldCallouts) {
             const callouts = [];
@@ -234,7 +235,6 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 this.addAxisLabel(t1, t1.toDateString());
             }
         }
-        //def addAxisLabel(self, dt, label, **kwargs):
         addAxisLabel(dt, label, kw) {
             //date, string?
             kw = kw || {};
@@ -275,28 +275,15 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
             const h = Timeline.getTextWidth('Helevetica', 6, label) + 2 * dy;
             this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
         }
-        //
-        //pure fn
         //sub fn createCallouts()
-        static sortCallouts(calloutsData) {
-            const sortedDates = [];
-            const eventsByDate = new Map();
-            for (let callout of calloutsData) {
-                const tmp = callout.date;
-                const eventDate = (new Date(tmp)).valueOf();
-                const event = callout.description;
-                const eventColor = callout.color || exports.Colors.black;
-                sortedDates.push(eventDate);
-                if (!(eventsByDate.has(eventDate))) {
-                    eventsByDate.set(eventDate, []); // [event_date] = []
-                }
-                const newInfo = [event, eventColor];
-                //get and modify reference
-                const events = eventsByDate.get(eventDate);
-                events.push(newInfo);
-            }
-            sortedDates.sort();
-            return [sortedDates, eventsByDate];
+        sortCallouts() {
+            this.data.callouts.sort(function (a, b) {
+                const tmpA = a.date;
+                const eventDateA = (new Date(tmpA)).valueOf();
+                const tmpB = b.date;
+                const eventDateB = (new Date(tmpB)).valueOf();
+                return eventDateA - eventDateB;
+            });
         }
         /**
          *
@@ -380,23 +367,22 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
          */
         createCallouts() {
             if (!('callouts' in this.data)) {
-                return; //undefined
+                return; //undefined todo type
             }
-            //type Info = [string, string];// event, color
-            //# sort callouts
-            const [sortedDates, eventsByDate] = Timeline.sortCallouts(this.data.callouts);
+            this.sortCallouts();
             //# add callouts, one by one, making sure they don't overlap
             let prevX = [-Infinity];
             let prevLevel = [-1];
             //vertical drawing up is negative ~= max height
             let minY = Infinity;
-            // for each callout
-            for (let eventDate of sortedDates) {
-                const [rawEvent, eventColor] = eventsByDate.get(eventDate).pop();
-                const numSeconds = (eventDate - this.date0) / 1000;
+            for (let callout of this.data.callouts) {
+                const eventColor = callout.color || exports.Colors.black;
+                const calloutDate = new Date(callout.date);
+                const calloutDateValue = calloutDate.valueOf();
+                const numSeconds = (calloutDateValue - this.date0) / 1000;
                 const percentWidth = numSeconds / this.totalSeconds;
                 if (percentWidth < 0 || percentWidth > 1) {
-                    const w = ["Skipped callout: ", rawEvent, ". percentWidth: ", percentWidth,
+                    const w = ["Skipped callout: ", callout.description, ". percentWidth: ", percentWidth,
                         ". Date not in range?"].join("");
                     console.warn(w);
                     continue;
@@ -404,7 +390,7 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 // positioning
                 const x = Math.trunc(percentWidth * this.width + 0.5);
                 //# figure out what 'level" to make the callout on
-                const [calloutHeight, event] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, rawEvent);
+                const [calloutHeight, event] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
                 const y = 0 - Timeline.calloutProperties.height - calloutHeight;
                 minY = Math.min(minY, y);
                 //svg elements
@@ -420,9 +406,7 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 txt.font({ family: 'Helevetica', size: '6pt', anchor: 'end' });
                 txt.fill(eventColor);
                 this.axisGroup.add(txt);
-                const eDate = new Date(eventDate);
-                this.addAxisLabel(eDate, eDate.toLocaleString(), { tick: false, fill: exports.Colors.black });
-                //XXX white is transparent?
+                this.addAxisLabel(calloutDate, calloutDate.toLocaleString(), { tick: false, fill: exports.Colors.black });
                 const circ = this.drawing.circle(8).attr({ fill: 'white', cx: x, cy: 0, stroke: eventColor });
                 this.axisGroup.add(circ);
             }
