@@ -24,6 +24,12 @@ function max<T>(x: T, y: T, fn: (val: T) => number): T {
     }
 }
 
+function maxString(a: string, b: string):string {
+    return max(a, b, function (val) {
+        return val.length;
+    });
+}
+
 //
 
 export const Colors: { black: string, gray: string } = {black: '#000000', gray: '#C0C0C0'};
@@ -227,7 +233,7 @@ export class Timeline {
     }
 
     // Generates svg document
-    public  build(): void {
+    public build(): void {
         //# MAGIC NUMBER: y_era
         //# draw era label and markers at this height
         const yEra: number = 10;
@@ -336,7 +342,7 @@ export class Timeline {
      * @param {String} color
      * @return {Array<marker, marker>}
      */
-    private  getMarkers(color: string): [any, any] {
+    private getMarkers(color: string): [any, any] {
 
         let startMarker;
         let endMarker;
@@ -359,7 +365,7 @@ export class Timeline {
     };
 
 
-    private  createMainAxis() {
+    private createMainAxis() {
         //# draw main line
         this.axisGroup.add(this.drawing.line(0, 0, this.width, 0)
             .stroke({color: Colors.black, width: 3}));
@@ -400,7 +406,7 @@ export class Timeline {
 
 
     //def addAxisLabel(self, dt, label, **kwargs):
-    private addAxisLabel(dt: Date, label: string, kw?: LabelKW) {
+    private addAxisLabel(dt: Date, label: string, kw?: LabelKW):void {
         //date, string?
         kw = kw || {};
 
@@ -474,6 +480,8 @@ export class Timeline {
                 eventsByDate.set(eventDate, []);// [event_date] = []
             }
             const newInfo: Info = [event, eventColor];
+
+            //get and modify reference
             const events: Array<Info> = eventsByDate.get(eventDate);
             events.push(newInfo);
 
@@ -492,15 +500,27 @@ export class Timeline {
         const cuttingRangeStart = Math.floor(str.length * 0.33);
         const cuttingRangeEnd = str.length * 0.66;
 
-        //TODO better
-        let maxCutPoint = 0;
+        const half = Math.floor(str.length / 2);
+
+        //TODO better?
+        //split at closest space to the center of the word
+        let bestSplitPoint: number = 0;
+        let splitValue: number = Infinity;
+
         for (let i = cuttingRangeStart; i < cuttingRangeEnd; i++) {
             if (str[i] == " ") {
-                maxCutPoint = i;
+
+                const v = Math.abs(i - half);
+                if (v < splitValue) {
+                    bestSplitPoint = i;
+                    splitValue = v;
+                }
             }
         }
-        if (maxCutPoint != 0) {
-            return [str.slice(0, maxCutPoint), str.slice(maxCutPoint + 1, str.length)];
+
+
+        if (bestSplitPoint != 0) {
+            return [str.slice(0, bestSplitPoint), str.slice(bestSplitPoint + 1, str.length)];
         } else {
             return null;
         }
@@ -531,8 +551,9 @@ export class Timeline {
 
     private static calculateEventLeftBondary(event: string, eventEndpoint: number): number {
         const textWidth: number = Timeline.getTextWidth('Helevetica', 6, event);
-        //const leftBoundary: number =
-        return eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+        const leftBoundary: number = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+
+        return leftBoundary;
     }
 
     //not pure fn
@@ -552,12 +573,10 @@ export class Timeline {
         if (bif) {
 
             //longest of 2 stings
-            const bifEvent: string = max(bif[0], bif[1], function (val) {
-                return val.length;
-            });
-            const bifBondary: number = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
+            const bifEvent: string = maxString(bif[0], bif[1]);
+            const bifBoundary: number = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
             // occupying 2 lines → +1
-            const bifLevel: number = Timeline.calculateCalloutLevel(bifBondary, prevEndpoints, prevLevels) + 1;
+            const bifLevel: number = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
             //compare levels somehow
 
             if (bifLevel < level) {
@@ -581,7 +600,7 @@ export class Timeline {
      *
      * @returns {number} min_y ?
      */
-    private  createCallouts(): number {
+    private createCallouts(): number {
         if (!('callouts' in this.data)) {
             return;//undefined
         }
@@ -623,7 +642,7 @@ export class Timeline {
             //svg elements
             const pathData: string = ['M', x, ',', 0, ' L', x, ',', y, ' L',
                 (x - Timeline.calloutProperties.width), ',', y].join("");
-            const pth = this.drawing.path(pathData).stroke({color: eventColor, width: 1, fill:"none"});
+            const pth = this.drawing.path(pathData).stroke({color: eventColor, width: 1, fill: "none"});
             pth.fill("none", 0);
 
             this.axisGroup.add(pth);

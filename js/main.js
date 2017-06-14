@@ -28,7 +28,8 @@ define(["require", "exports", "./src/timeline", "./lib/svgjs", "jquery"], functi
     let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
     // test timelines
     const sample = "res/simple_timeline.json";
-    const anime = "res/animev2.json";
+    // const anime = "res/animev2.json";
+    const anime = "res/test.json";
     const foo = loadData(sample);
     const bar = loadData(anime);
     const tl = new timeline_1.Timeline(foo, "sampleTimeline");

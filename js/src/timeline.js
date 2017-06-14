@@ -22,6 +22,11 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
             return y;
         }
     }
+    function maxString(a, b) {
+        return max(a, b, function (val) {
+            return val.length;
+        });
+    }
     //
     exports.Colors = { black: '#000000', gray: '#C0C0C0' };
     class TimelineConverter {
@@ -286,6 +291,7 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                     eventsByDate.set(eventDate, []); // [event_date] = []
                 }
                 const newInfo = [event, eventColor];
+                //get and modify reference
                 const events = eventsByDate.get(eventDate);
                 events.push(newInfo);
             }
@@ -300,15 +306,22 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
         static bifercateString(str) {
             const cuttingRangeStart = Math.floor(str.length * 0.33);
             const cuttingRangeEnd = str.length * 0.66;
-            //TODO better
-            let maxCutPoint = 0;
+            const half = Math.floor(str.length / 2);
+            //TODO better?
+            //split at closest space to the center of the word
+            let bestSplitPoint = 0;
+            let splitValue = Infinity;
             for (let i = cuttingRangeStart; i < cuttingRangeEnd; i++) {
                 if (str[i] == " ") {
-                    maxCutPoint = i;
+                    const v = Math.abs(i - half);
+                    if (v < splitValue) {
+                        bestSplitPoint = i;
+                        splitValue = v;
+                    }
                 }
             }
-            if (maxCutPoint != 0) {
-                return [str.slice(0, maxCutPoint), str.slice(maxCutPoint + 1, str.length)];
+            if (bestSplitPoint != 0) {
+                return [str.slice(0, bestSplitPoint), str.slice(bestSplitPoint + 1, str.length)];
             }
             else {
                 return null;
@@ -332,8 +345,8 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
         }
         static calculateEventLeftBondary(event, eventEndpoint) {
             const textWidth = Timeline.getTextWidth('Helevetica', 6, event);
-            //const leftBoundary: number =
-            return eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+            const leftBoundary = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+            return leftBoundary;
         }
         //not pure fn
         //sub fn createCallouts()
@@ -345,12 +358,10 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
             const bif = Timeline.bifercateString(event);
             if (bif) {
                 //longest of 2 stings
-                const bifEvent = max(bif[0], bif[1], function (val) {
-                    return val.length;
-                });
-                const bifBondary = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
+                const bifEvent = maxString(bif[0], bif[1]);
+                const bifBoundary = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
                 // occupying 2 lines → +1
-                const bifLevel = Timeline.calculateCalloutLevel(bifBondary, prevEndpoints, prevLevels) + 1;
+                const bifLevel = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
                 //compare levels somehow
                 if (bifLevel < level) {
                     level = bifLevel;
