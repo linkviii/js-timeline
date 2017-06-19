@@ -77,18 +77,19 @@ See [res/animev2.json](res/animev2.json) for an example.
 * `start`~ is the date/time of the leftmost date/time on the axis.
 * `end`~ is the date/time of the rightmost date/time on the axis.
 * `num_ticks`~ controls the number of tickmarks along the axis between the `start` and `end` date/times (inclusive).  If this field is not present, no tickmarks will be generated except for those at the `start` and `end` dates.
-* `tick_format`~ is unimplemented
+* `tick_format`~ [strftime](https://github.com/samsonjs/strftime#supported-specifiers) date format. 
 * `callouts` are events on the timeline.
-* `eras` are (?shaded) areas on the timeline.
+* `eras` are (shaded) areas on the timeline.
 
 ## Version
 * **`apiVersion`** changes in response to changes in the json's interface.
-* **Library** version can be found at the top of [src/timeline.ts](src/timeline.ts). The version is (not strictly) the date that the last feature change was made. Code pushed on the `gh-pages` (master) branch should never be broken.
+* **Library** version can be found at the top of [src/timeline.ts](src/timeline.ts). The version is (not strictly) the date that the last feature change was made. Code pushed on the `gh-pages` (master) branch should never be broken. If people use this, semantic versioning and a changelog may come. 
 
 ## Dependencies 
 * jquery
-* [svg.js](http://svgjs.com/): © 2012 - 2016 Wout Fierens - svg.js is released under the terms of the MIT license.  
+* [svg.js](http://svgjs.com/): © 2012 - 2016 Wout Fierens - svg.js is released under the terms of the MIT license. 
+* [strftime](https://github.com/samsonjs/strftime) Copyright 2010 - 2016 Sami Samhuri sami@samhuri.net - MIT license
 
 ## License
 
-MIT licensed
+MIT licensed. Please use with all freedom if you find this useful. 

@@ -5,7 +5,7 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 2017-2-4
+ * v 2017-6-18
  *   (Try to change with new features. Not strict.)
  * 
  * MIT licenced
@@ -14,6 +14,13 @@
 
 /// <reference path="../lib/svgjs.d.ts"/>
 import * as SVG from "../lib/svgjs";
+
+import strFtime = require("../lib/strftime");
+declare function strftime(format: string, date: Date);
+
+console.info("init strftime");
+console.info(strFtime);
+
 
 //Util
 function max<T>(x: T, y: T, fn: (val: T) => number): T {
@@ -241,7 +248,7 @@ export class Timeline {
         //# create main axis and callouts,
         //# keeping track of how high the callouts are
         this.createMainAxis();
-        const yCallouts = this.createCallouts();
+        const yCallouts: number = this.createCallouts();
 
         //# determine axis position so that axis + callouts don't overlap with eras
         const yAxis: number = yEra + Timeline.calloutProperties.height - yCallouts;
@@ -268,10 +275,9 @@ export class Timeline {
         }
 
         //# create eras
-        let erasData: TimelineEraV2[] = this.data.eras;
         //let markers = {};
 
-        for (let era of erasData) {
+        for (let era of this.data.eras) {
             //# extract era data
 
             const name: string = era.name;
@@ -383,7 +389,7 @@ export class Timeline {
             for (let j = 1; j < numTicks; j++) {
                 const tickDelta = /*new Date*/(j * delta / numTicks);
                 const tickmarkDate = new Date(this.startDate.valueOf() + tickDelta);
-                this.addAxisLabel(tickmarkDate, tickmarkDate.toDateString())
+                this.addAxisLabel(tickmarkDate, tickmarkDate.toDateString());
             }
         }
     }
@@ -413,6 +419,7 @@ export class Timeline {
             //##label = dt[0].strftime(self.tickFormat)
             // label = dt
             //TODO tick format
+            label = strftime(this.tickFormat, dt);
         }
         const percentWidth: number = (dt.valueOf() - this.date0) / 1000 / this.totalSeconds;
         if (percentWidth < 0 || percentWidth > 1) {
@@ -564,7 +571,7 @@ export class Timeline {
 
             if (bifLevel < level) {
                 level = bifLevel;
-                event = bif.join("\n")
+                event = bif.join("\n");
             }
         }
 
@@ -580,12 +587,13 @@ export class Timeline {
     //
 
     /**
+     * Adds callouts and calculates the height needed.
      *
-     * @returns {number} min_y ?
+     * @returns {number} min_y
      */
     private createCallouts(): number {
         if (!('callouts' in this.data)) {
-            return;//undefined todo type
+            return 0;
         }
 
         this.sortCallouts();

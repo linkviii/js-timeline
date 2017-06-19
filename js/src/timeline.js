@@ -5,14 +5,16 @@
  *
  * Usage: `new Timeline(tlData, "timelineID").build();`
  *
- * v 2017-2-4
+ * v 2017-6-18
  *   (Try to change with new features. Not strict.)
  *
  * MIT licenced
  */
-define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) {
+define(["require", "exports", "../lib/svgjs", "../lib/strftime"], function (require, exports, SVG, strFtime) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    console.info("init strftime");
+    console.info(strFtime);
     //Util
     function max(x, y, fn) {
         if (fn(x) > fn(y)) {
@@ -137,9 +139,8 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 return;
             }
             //# create eras
-            let erasData = this.data.eras;
             //let markers = {};
-            for (let era of erasData) {
+            for (let era of this.data.eras) {
                 //# extract era data
                 const name = era.name;
                 const t0 = (new Date(era.startDate)).valueOf();
@@ -242,6 +243,7 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
                 //##label = dt[0].strftime(self.tickFormat)
                 // label = dt
                 //TODO tick format
+                label = strftime(this.tickFormat, dt);
             }
             const percentWidth = (dt.valueOf() - this.date0) / 1000 / this.totalSeconds;
             if (percentWidth < 0 || percentWidth > 1) {
@@ -362,12 +364,13 @@ define(["require", "exports", "../lib/svgjs"], function (require, exports, SVG) 
         }
         //
         /**
+         * Adds callouts and calculates the height needed.
          *
-         * @returns {number} min_y ?
+         * @returns {number} min_y
          */
         createCallouts() {
             if (!('callouts' in this.data)) {
-                return; //undefined todo type
+                return 0;
             }
             this.sortCallouts();
             //# add callouts, one by one, making sure they don't overlap
