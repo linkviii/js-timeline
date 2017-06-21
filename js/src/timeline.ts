@@ -169,6 +169,10 @@ interface LabelKW {
     fill?: string;
 }
 
+/**
+ * For when a `!(0 <= percentWidth <= 100)`.
+ * Shouldn't be possible though?
+ */
 class OoBDate extends Error {
 }
 
@@ -253,6 +257,8 @@ export class Timeline {
         this.createMainAxis();
         const yCallouts: number = this.createCallouts();
 
+        this.createDateTicks();
+
         //# determine axis position so that axis + callouts don't overlap with eras
         const yAxis: number = yEra + Timeline.calloutProperties.height - yCallouts;
 
@@ -279,7 +285,7 @@ export class Timeline {
      return Math.trunc(percentWidth * this.width + 0.5);
      }
      */
-    
+
     private dateToX(date: Date): number | OoBDate {
         // const percentWidth: number = this.datePercentWidth(date);
         const percentWidth: number = (date.valueOf() - this.date0) / 1000 / this.totalSeconds;
@@ -311,6 +317,8 @@ export class Timeline {
             const [startMarker, endMarker] = this.getMarkers(fill);
 
             //# create boundary lines
+            //if date isn't in bounds, something interesting will happen
+            //But that shouldn't be possible?
             const x0: number = <number> this.dateToX(new Date(era.startDate));
             const x1: number = <number> this.dateToX(new Date(era.endDate));
 
@@ -387,24 +395,25 @@ export class Timeline {
     };
 
 
-    private createMainAxis() {
+    private createMainAxis(): void {
         //# draw main line
         this.axisGroup.add(this.drawing.line(0, 0, this.width, 0)
             .stroke({color: Colors.black, width: 3}));
 
-        //# add tickmarks
-        //self.addAxisLabel(self.startDate, str(self.startDate[0]), tick=True)
+    }
+
+    private createDateTicks(): void {
         this.addAxisLabel(this.startDate, this.startDate.toDateString(), {tick: true});
         this.addAxisLabel(this.endDate, this.endDate.toDateString(), {tick: true});
 
         if ('numTicks' in this.data) {
-            const delta = this.endDate.valueOf() - this.startDate.valueOf();
-            //let secs = delta / 1000
+            const timeRange = this.endDate.valueOf() - this.startDate.valueOf();
+
             const numTicks = this.data.numTicks;
-            //needs more?
+
             for (let j = 1; j < numTicks; j++) {
-                const tickDelta = /*new Date*/(j * delta / numTicks);
-                const tickmarkDate = new Date(this.startDate.valueOf() + tickDelta);
+                const timeOffset = (j * timeRange / numTicks);
+                const tickmarkDate = new Date(this.startDate.valueOf() + timeOffset);
                 this.addAxisLabel(tickmarkDate, tickmarkDate.toDateString());
             }
         }
