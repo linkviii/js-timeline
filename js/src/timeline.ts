@@ -169,6 +169,9 @@ interface LabelKW {
     fill?: string;
 }
 
+class OoBDate extends Error {
+}
+
 
 export class Timeline {
 
@@ -268,6 +271,27 @@ export class Timeline {
 
     }
 
+    /*
+     private datePercentWidth(date: Date): number {
+     return (date.valueOf() - this.date0) / 1000 / this.totalSeconds;
+     }
+     private percentWidthToX(percentWidth: number): number {
+     return Math.trunc(percentWidth * this.width + 0.5);
+     }
+     */
+    
+    private dateToX(date: Date): number | OoBDate {
+        // const percentWidth: number = this.datePercentWidth(date);
+        const percentWidth: number = (date.valueOf() - this.date0) / 1000 / this.totalSeconds;
+
+        if (percentWidth < 0 || percentWidth > 1) {
+            // console.log(percentWidth)
+            return new OoBDate("" + percentWidth);
+        }
+
+        // return this.percentWidthToX(percentWidth);
+        return Math.trunc(percentWidth * this.width + 0.5);
+    }
 
     private createEras(yEra: number, yAxis: number, height: number): void {
         if (!('eras' in this.data)) {
@@ -281,22 +305,14 @@ export class Timeline {
             //# extract era data
 
             const name: string = era.name;
-
-            const t0: number = (new Date(era.startDate)).valueOf();
-            const t1: number = (new Date(era.endDate)).valueOf();
-
             const fill: string = era.color || Colors.gray;
 
 
             const [startMarker, endMarker] = this.getMarkers(fill);
 
-
             //# create boundary lines
-            const percentWidth0: number = (t0 - this.date0) / 1000 / this.totalSeconds;
-            const percentWidth1: number = (t1 - this.date0) / 1000 / this.totalSeconds;
-
-            const x0: number = Math.trunc(percentWidth0 * this.width + 0.5);
-            const x1: number = Math.trunc(percentWidth1 * this.width + 0.5);
+            const x0: number = <number> this.dateToX(new Date(era.startDate));
+            const x1: number = <number> this.dateToX(new Date(era.endDate));
 
 
             const rect = this.drawing.rect(x1 - x0, height);
@@ -412,23 +428,22 @@ export class Timeline {
 
 
     private addAxisLabel(dt: Date, label: string, kw?: LabelKW): void {
-        //date, string?
-        kw = kw || {};
 
+        kw = kw || {};
+        const fill: string = kw.fill || Colors.gray;
         if (this.tickFormat) {
-            //##label = dt[0].strftime(self.tickFormat)
-            // label = dt
-            //TODO tick format
             label = strftime(this.tickFormat, dt);
         }
-        const percentWidth: number = (dt.valueOf() - this.date0) / 1000 / this.totalSeconds;
-        if (percentWidth < 0 || percentWidth > 1) {
+
+        const x: number | OoBDate = this.dateToX(dt);
+
+        if (x instanceof OoBDate) {
             //error? Log?
-            console.log(dt);
+            console.warn("Out of bounds label.");
+            console.warn([dt, label, x]);
             return;
         }
 
-        const x: number = Math.trunc(percentWidth * this.width + 0.5);
         const dy: number = 5;
 
         // # add tick on line
@@ -442,9 +457,6 @@ export class Timeline {
         }
 
         // # add label
-        const fill: string = kw.fill || Colors.gray;
-
-
         /*
          #self.drawing.text(label, insert=(x, -2 * dy), stroke='none', fill=fill, font_family='Helevetica',
          ##font_size='6pt', text_anchor='end', writing_mode='tb', transform=transform))
@@ -610,21 +622,14 @@ export class Timeline {
             const eventColor: string = callout.color || Colors.black;
 
             const calloutDate: Date = new Date(callout.date);
-            const calloutDateValue: number = calloutDate.valueOf();
 
-            const numSeconds: number = (calloutDateValue - this.date0) / 1000;
-            const percentWidth: number = numSeconds / this.totalSeconds;
-
-            if (percentWidth < 0 || percentWidth > 1) {
-                const w: string = ["Skipped callout: ", callout.description, ". percentWidth: ", percentWidth,
-                    ". Date not in range?"].join("");
-                console.warn(w);
+            const x: number | OoBDate = this.dateToX(calloutDate);
+            if (x instanceof OoBDate) {
+                console.warn([callout, calloutDate, OoBDate]);
                 continue;
             }
 
 
-            // positioning
-            const x: number = Math.trunc(percentWidth * this.width + 0.5);
             //# figure out what 'level" to make the callout on
             const [calloutHeight, event]: [number, string] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
             const y: number = 0 - Timeline.calloutProperties.height - calloutHeight;
