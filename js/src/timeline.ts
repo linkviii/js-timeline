@@ -15,11 +15,11 @@
 /// <reference path="../lib/svgjs.d.ts"/>
 import * as SVG from "../lib/svgjs";
 
-import strFtime = require("../lib/strftime");
+/// <reference path="../lib/strftime" />
 declare function strftime(format: string, date: Date);
 
-console.info("init strftime");
-console.info(strFtime);
+// console.info("init strftime");
+// console.info(strftime);
 
 
 //Util
@@ -279,12 +279,15 @@ export class Timeline {
     }
 
 
-    private addAxisLabel(dt: Date, label: string, kw?: LabelKW): void {
+    private addAxisLabel(dt: Date, kw?: LabelKW): void {
 
         kw = kw || {};
         const fill: string = kw.fill || Colors.gray;
+        let label: string;
         if (this.tickFormat) {
-            label = strftime(this.tickFormat, dt);
+            label = strftime (this.tickFormat, dt);
+        } else {
+            label = dt.toDateString();
         }
 
         const x: number | OoBDate = this.dateToX(dt);
@@ -506,7 +509,7 @@ export class Timeline {
             this.axisGroup.add(txt);
 
 
-            this.addAxisLabel(calloutDate, calloutDate.toLocaleString(),
+            this.addAxisLabel(calloutDate,
                 {tick: false, fill: Colors.black});
 
             const circ = this.drawing.circle(8).attr({fill: 'white', cx: x, cy: 0, stroke: eventColor});
@@ -524,8 +527,8 @@ export class Timeline {
     ///
 
     private createDateTicks(): void {
-        this.addAxisLabel(this.startDate, this.startDate.toDateString(), {tick: true});
-        this.addAxisLabel(this.endDate, this.endDate.toDateString(), {tick: true});
+        this.addAxisLabel(this.startDate, {tick: true});
+        this.addAxisLabel(this.endDate, {tick: true});
 
         if ('numTicks' in this.data) {
             const timeRange = this.endDate.valueOf() - this.startDate.valueOf();
@@ -535,7 +538,7 @@ export class Timeline {
             for (let j = 1; j < numTicks; j++) {
                 const timeOffset = (j * timeRange / numTicks);
                 const tickmarkDate = new Date(this.startDate.valueOf() + timeOffset);
-                this.addAxisLabel(tickmarkDate, tickmarkDate.toDateString());
+                this.addAxisLabel(tickmarkDate);
             }
         }
     }
@@ -574,8 +577,6 @@ export class Timeline {
         }
 
         //# create eras
-        //let markers = {};
-
         for (let era of this.data.eras) {
             //# extract era data
 
@@ -592,12 +593,14 @@ export class Timeline {
             const x1: number = <number> this.dateToX(new Date(era.endDate));
 
 
+            // Shaded area
             const rect = this.drawing.rect(x1 - x0, height);
             rect.x(x0);
             rect.fill({color: fill, opacity: 0.15});
 
             this.drawing.add(rect);
 
+            // Boundary lines
             const line0 = this.drawing.add(
                 this.drawing.line(x0, 0, x0, yAxis)
                     .stroke({color: fill, width: 0.5})
@@ -621,19 +624,17 @@ export class Timeline {
                     .stroke({color: fill, width: 0.75})
             );
 
-            //TODO markers?
-            /*
-             horz['marker-start'] = start_marker.get_funciri()
-             horz['marker-end'] = end_marker.get_funciri()
-             self.drawing.add(self.drawing.text(name, insert=(0.5*(x0 + x1), y_era - self.textFudge[1]), stroke='none',
-             ````fill=fill, font_family="Helevetica", font_size="6pt", text_anchor="middle"))
-             */
+            // Era title
             const txt = this.drawing.text(name);
             txt.font({family: 'Helevetica', size: '6pt', anchor: 'middle'});
             txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1] - 9);
             txt.fill(fill);
 
             this.drawing.add(txt);
+
+            // axis dates
+            // todo move lables
+
         }//end era loop
     }
 
@@ -647,8 +648,8 @@ export class Timeline {
         for (let era of erasData) {
             let t0 = new Date(era.startDate);
             let t1 = new Date(era.endDate);
-            this.addAxisLabel(t0, t0.toDateString());
-            this.addAxisLabel(t1, t1.toDateString());
+            this.addAxisLabel(t0);
+            this.addAxisLabel(t1);
         }
     }
 

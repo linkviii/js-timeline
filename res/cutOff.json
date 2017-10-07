@@ -1,0 +1,233 @@
+{
+    "apiVersion": 2,
+    "width": 1000,
+    "startDate": "2016-01-02",
+    "endDate": "2016-05-24",
+    "callouts": [
+        {
+            "description": "Started Fullmetal Alchemist",
+            "date": "2016-04-08",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Fullmetal Alchemist",
+            "date": "2016-04-13",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started FLCL",
+            "date": "2016-04-08",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished FLCL",
+            "date": "2016-04-14",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Noir",
+            "date": "2016-01-07",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Noir",
+            "date": "2016-02-15",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Fullmetal Alchemist: The Conqueror of Shamballa",
+            "date": "2016-04-23"
+        },
+        {
+            "description": "Death Note",
+            "date": "2016-01-02"
+        },
+        {
+            "description": "Started Durarara!!",
+            "date": "2016-04-16",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Durarara!!",
+            "date": "2016-04-22",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
+            "date": "2016-03-27",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.",
+            "date": "2016-04-05",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Inu x Boku SS",
+            "date": "2016-05-21"
+        },
+        {
+            "description": "Started Another",
+            "date": "2016-02-12",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Another",
+            "date": "2016-02-13",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Hentai Ouji to Warawanai Neko.",
+            "date": "2016-01-04",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Hentai Ouji to Warawanai Neko.",
+            "date": "2016-01-04",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Grisaia no Kajitsu",
+            "date": "2016-02-12",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Grisaia no Kajitsu",
+            "date": "2016-02-14",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Kitakubu Katsudou Kiroku",
+            "date": "2016-05-20",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Kitakubu Katsudou Kiroku",
+            "date": "2016-05-23",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Noragami",
+            "date": "2016-03-07",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Noragami",
+            "date": "2016-03-25",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Hitsugi no Chaika",
+            "date": "2016-02-14",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Hitsugi no Chaika",
+            "date": "2016-02-24",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Hitsugi no Chaika: Avenging Battle",
+            "date": "2016-03-25",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Hitsugi no Chaika: Avenging Battle",
+            "date": "2016-03-27",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Trinity Seven",
+            "date": "2016-03-05",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Trinity Seven",
+            "date": "2016-03-05",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Trinity Seven OVA",
+            "date": "2016-03-05"
+        },
+        {
+            "description": "Started Rokka no Yuusha",
+            "date": "2016-03-06",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Rokka no Yuusha",
+            "date": "2016-03-07",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Gate: Jieitai Kanochi nite, Kaku Tatakaeri",
+            "date": "2016-02-07"
+        },
+        {
+            "description": "Grisaia no Meikyuu: Caprice no Mayu 0",
+            "date": "2016-02-25"
+        },
+        {
+            "description": "Started Grisaia no Rakuen",
+            "date": "2016-02-26",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Grisaia no Rakuen",
+            "date": "2016-03-04",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Shimoneta to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai",
+            "date": "2016-02-20",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Shimoneta to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai",
+            "date": "2016-02-25",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Rakudai Kishi no Cavalry",
+            "date": "2016-01-02",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Rakudai Kishi no Cavalry",
+            "date": "2016-01-03",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Noragami Aragoto",
+            "date": "2016-03-08",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Noragami Aragoto",
+            "date": "2016-03-11",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Boku dake ga Inai Machi",
+            "date": "2016-04-23",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Boku dake ga Inai Machi",
+            "date": "2016-05-20",
+            "color": "#CD3F85"
+        },
+        {
+            "description": "Started Hai to Gensou no Grimgar",
+            "date": "2016-05-23",
+            "color": "#C0C0FF"
+        },
+        {
+            "description": "finished Hai to Gensou no Grimgar",
+            "date": "2016-05-24",
+            "color": "#CD3F85"
+        }
+    ],
+    "tickFormat": "%Y-%m-%d "
+}

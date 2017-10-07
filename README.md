@@ -88,7 +88,8 @@ See [res/animev2.json](res/animev2.json) for an example.
 ## Dependencies 
 * jquery
 * [svg.js](http://svgjs.com/): © 2012 - 2016 Wout Fierens - svg.js is released under the terms of the MIT license. 
-* [strftime](https://github.com/samsonjs/strftime) Copyright 2010 - 2016 Sami Samhuri sami@samhuri.net - MIT license
+* [strftime](https://github.com/samsonjs/strftime): Copyright 2010 - 2016 Sami Samhuri sami@samhuri.net - MIT license
+  * `<script>`
 
 ## License
 

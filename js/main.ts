@@ -13,6 +13,8 @@ import * as SVG from "./lib/svgjs";
 
 import * as $ from "jquery";
 
+console.log("motd")
+
 // read a file the "wrong" way
 function loadData(filename: string): any {
     return (function () {
@@ -38,8 +40,10 @@ let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
 // test timelines
 
 const sample = "res/simple_timeline.json";
+// const sample = "res/no_callout.json";
 // const anime = "res/animev2.json";
-const anime = "res/test.json";
+const anime = "res/cutOff.json";
+// const anime = "res/test.json";
 
 const foo: TimelineData = loadData(sample);
 const bar: TimelineData = loadData(anime);
