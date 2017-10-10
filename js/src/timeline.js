@@ -3,9 +3,9 @@
  * Based on https://github.com/jasonreisman/Timeline written in python.
  * Slightly documented: https://github.com/linkviii/Timeline
  *
- * Usage: `new Timeline(tlData, "timelineID").build();`
+ * See README.md
  *
- * v 2017-6-18
+ * v 2017-10-9
  *   (Try to change with new features. Not strict.)
  *
  * MIT licenced
