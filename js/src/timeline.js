@@ -182,7 +182,7 @@ export class Timeline {
         //writing mode?
         const txt = this.drawing.text(label);
         txt.font({ family: 'Helevetica', size: '6pt', anchor: 'end' });
-        txt.transform({ rotation: 270, cx: x, cy: 0 });
+        txt.transform({ rotate: 270, ox: x, oy: 0 });
         txt.dx(x - 7).dy((-2 * dy) + 5);
         txt.fill(fill);
         this.axisGroup.add(txt);
