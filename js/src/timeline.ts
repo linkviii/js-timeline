@@ -12,8 +12,11 @@
  */
 
 
-/// <reference path="../lib/svgjs.d.ts"/>
-import * as SVG from "../lib/svgjs";
+/// - <reference path="../lib/svgjs.d.ts"/>
+// import * as SVG from "../lib/svgjs.js";
+
+declare function SVG();
+
 
 declare function strftime(format: string, date: Date);
 
@@ -225,7 +228,7 @@ export class Timeline {
         this.width = this.data.width;
         this.deadWidth = 0;
 
-        this.drawing = SVG(id);
+        this.drawing = SVG().addTo('#' + id);
         this.axisGroup = this.drawing.group();
 
         this.startDate = new Date(this.data.startDate);

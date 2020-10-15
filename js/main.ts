@@ -1,17 +1,17 @@
 /*
  * Demonstrate the use of the timeline library.
  *
- * MIT licenced.
+ * MIT licensed.
  *
  */
 
 
-import {Timeline, TimelineData} from "./src/timeline";
+import {Timeline, TimelineData} from "./src/timeline.js";
 
-/// <reference path="lib/svgjs.d.ts"/>
-import * as SVG from "./lib/svgjs";
 
-import * as $ from "jquery";
+import  "./jquery.js";
+
+declare function SVG();
 
 console.log("motd")
 
@@ -34,7 +34,7 @@ function loadData(filename: string): any {
 }
 
 // test svg library
-let draw = SVG('drawing');//.size(300, 300);
+let draw = SVG().addTo('#drawing');//.size(300, 300);
 let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
 
 // test timelines

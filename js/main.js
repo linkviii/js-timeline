@@ -4,41 +4,46 @@
  * MIT licenced.
  *
  */
-define(["require", "exports", "./src/timeline", "./lib/svgjs", "jquery"], function (require, exports, timeline_1, SVG, $) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    console.log("motd");
-    // read a file the "wrong" way
-    function loadData(filename) {
-        return (function () {
-            let json = null;
-            $.ajax({
-                async: false,
-                global: false,
-                url: filename,
-                dataType: "json",
-                success: function (data) {
-                    json = data;
-                }
-            });
-            return json;
-        })();
-    }
-    // test svg library
-    let draw = SVG('drawing'); //.size(300, 300);
-    let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
-    // test timelines
-    const sample = "res/simple_timeline.json";
-    // const sample = "res/no_callout.json";
-    // const anime = "res/animev2.json";
-    const anime = "res/cutOff.json";
-    // const anime = "res/test.json";
-    const foo = loadData(sample);
-    const bar = loadData(anime);
-    const tl = new timeline_1.Timeline(foo, "sampleTimeline");
-    const t2 = new timeline_1.Timeline(bar, "animeTimeline");
-    //console.log( tl.data);
-    tl.build();
-    t2.build();
-});
+import { Timeline } from "./src/timeline.js";
+// / <reference path="lib/svgjs.d.ts"/>
+// import * as SVG from "./lib/svgjs.js";
+// import * as SVG from "./lib/svg.js";
+// import {SVG} from "./lib/svg.js";
+// import "./lib/svg.js";
+// import * as $ from "./jquery.js";
+import "./jquery.js";
+console.log("motd");
+// read a file the "wrong" way
+function loadData(filename) {
+    return (function () {
+        let json = null;
+        $.ajax({
+            async: false,
+            global: false,
+            url: filename,
+            dataType: "json",
+            success: function (data) {
+                json = data;
+            }
+        });
+        return json;
+    })();
+}
+// test svg library
+// let draw = SVG('drawing');//.size(300, 300);
+let draw = SVG().addTo('#drawing'); //.size(300, 300);
+let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
+// test timelines
+const sample = "res/simple_timeline.json";
+// const sample = "res/no_callout.json";
+// const anime = "res/animev2.json";
+const anime = "res/cutOff.json";
+// const anime = "res/test.json";
+const foo = loadData(sample);
+const bar = loadData(anime);
+const tl = new Timeline(foo, "sampleTimeline");
+const t2 = new Timeline(bar, "animeTimeline");
+//console.log( tl.data);
+tl.build();
+t2.build();
 //# sourceMappingURL=main.js.map

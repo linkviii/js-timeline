@@ -2,14 +2,11 @@
   "compilerOptions": {
     "target": "es6",
     "sourceMap": true,
-    "module": "amd",
+    "module": "ES6",
     "baseUrl": "./js"
   },
   "exclude": [
     "node_modules"
   ],
-  "files": [
-    "js/src/timeline.ts",
-    "js/main.ts"
-  ]
+
 }
