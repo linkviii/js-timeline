@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>svg stuffs</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png">
 </head>
 
 <body>
 
-<p>stuffs</p>
+    <p>stuffs</p>
 
-<p>sample</p>
-<div id="sampleTimeline"></div>
-<p>watched anime</p>
-<div id="animeTimeline"></div>
+    <p>sample</p>
+    <div id="sampleTimeline"></div>
+    <p>watched anime</p>
+    <div id="animeTimeline"></div>
 
 
-<p>stuff's done</p>
-<div id="drawing"></div>
+    <p>stuff's done</p>
+    <div id="drawing"></div>
 
-<script src="./js/lib/svg.js"></script> 
-<script src="js/lib/strftime.js"></script>
-<script type="module">import "./js/main.js"</script>
+    <script src="./js/lib/svg.js"></script>
+    <script src="js/lib/strftime.js"></script>
+    <script type="module">
+        import * as main from "./js/main.js";
+        window.main = main;
+        console.log("main module loaded");
+    </script>
 
 
 
 </body>
 
-</html> 
+</html>
