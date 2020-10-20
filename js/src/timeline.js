@@ -181,12 +181,12 @@ export class Timeline {
          */
         //writing mode?
         const txt = this.drawing.text(label);
-        txt.font({ family: 'Helevetica', size: '6pt', anchor: 'end' });
+        txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
         txt.transform({ rotate: 270, ox: x, oy: 0 });
         txt.dx(x - 7).dy((-2 * dy) + 5);
         txt.fill(fill);
         this.axisGroup.add(txt);
-        const h = Timeline.getTextWidth('Helevetica', 6, label) + 2 * dy;
+        const h = Timeline.getTextWidth('Helevetica', Timeline.fontSize, label) + 2 * dy;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
     }
     ///
@@ -245,7 +245,7 @@ export class Timeline {
         return level;
     }
     static calculateEventLeftBondary(event, eventEndpoint) {
-        const textWidth = Timeline.getTextWidth('Helevetica', 6, event);
+        const textWidth = Timeline.getTextWidth('Helevetica', Timeline.fontSize, event);
         const leftBoundary = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
         return leftBoundary;
     }
@@ -288,6 +288,8 @@ export class Timeline {
         let prevLevel = [-1];
         //vertical drawing up is negative ~= max height
         let minY = Infinity;
+        // Last place we drew an axis label
+        let lastLabelX = 0;
         for (let callout of this.data.callouts) {
             const eventColor = callout.color || Colors.black;
             const calloutDate = new Date(callout.date);
@@ -309,11 +311,15 @@ export class Timeline {
             const foo = 6;
             const txt = this.drawing.text(event);
             txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);
+            // TODO wut
             txt.dy(y - 4 * Timeline.textFudge[1] - foo);
-            txt.font({ family: 'Helevetica', size: '6pt', anchor: 'end' });
+            txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
             this.axisGroup.add(txt);
-            this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
+            if (x - lastLabelX > Timeline.fontSize) {
+                lastLabelX = x;
+                this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
+            }
             const circ = this.drawing.circle(8).attr({ fill: 'white', cx: x, cy: 0, stroke: eventColor });
             this.axisGroup.add(circ);
         }
@@ -394,7 +400,7 @@ export class Timeline {
                 .stroke({ color: fill, width: 0.75 }));
             // Era title
             const txt = this.drawing.text(name);
-            txt.font({ family: 'Helevetica', size: '6pt', anchor: 'middle' });
+            txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'middle' });
             txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1] - 9);
             txt.fill(fill);
             this.drawing.add(txt);
@@ -432,12 +438,14 @@ export class Timeline {
         return w;
     }
 }
+Timeline.fontSize = 6;
 Timeline.calloutProperties = {
     width: 10,
     height: 15,
     increment: 10
 };
-Timeline.textFudge = [3, 1.5]; //factor? [?, ?]
+// x,y of adjustment of callout text
+Timeline.textFudge = [3, 0.5];
 //
 //
 //
