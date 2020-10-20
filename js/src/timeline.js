@@ -131,7 +131,8 @@ export class Timeline {
         }
         // clamp to a positive value
         minX = Math.max(0, -minX);
-        this.deadWidth = minX;
+        // this.deadWidth = minX;
+        this.extraWidth = minX;
     }
     createMainAxis() {
         //# draw main line
@@ -426,9 +427,11 @@ export class Timeline {
         //# create eras and labels using axis height and overall height
         this.createEras(yEra, yAxis, height);
         //# translate the axis group and add it to the drawing
-        this.axisGroup.translate(0, yAxis);
+        // this.axisGroup.translate(0, yAxis);
+        this.axisGroup.translate(this.extraWidth, yAxis);
         this.drawing.add(this.axisGroup);
-        this.drawing.size(this.width, height);
+        // this.drawing.size(this.width, height);
+        this.drawing.size(this.width + this.extraWidth, height);
     }
     static getTextWidth(family, size, text) {
         //use canvas to measure text width

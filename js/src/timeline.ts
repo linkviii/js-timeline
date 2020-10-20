@@ -214,7 +214,8 @@ export class Timeline {
     public readonly width: number;
     /** Width that is "dead" to accommodate long text on the far left */
     public deadWidth: number;
-
+    public extraWidth: number;
+    
     public readonly drawing;
     public readonly axisGroup;
 
@@ -275,7 +276,8 @@ export class Timeline {
         // clamp to a positive value
         minX = Math.max(0, -minX);
 
-        this.deadWidth = minX;
+        // this.deadWidth = minX;
+        this.extraWidth = minX;
     }
 
 
@@ -697,10 +699,12 @@ export class Timeline {
         this.createEras(yEra, yAxis, height);
 
         //# translate the axis group and add it to the drawing
-        this.axisGroup.translate(0, yAxis);
+        // this.axisGroup.translate(0, yAxis);
+        this.axisGroup.translate(this.extraWidth, yAxis);
         this.drawing.add(this.axisGroup);
 
-        this.drawing.size(this.width, height);
+        // this.drawing.size(this.width, height);
+        this.drawing.size(this.width+this.extraWidth, height);
 
     }
 
