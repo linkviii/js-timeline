@@ -8,7 +8,7 @@
  * v 2017-10-9
  *   (Try to change with new features. Not strict.)
  * 
- * MIT licenced
+ * MIT licensed
  */
 
 
@@ -319,35 +319,35 @@ export class Timeline {
             return;
         }
 
-        const dy: number = 5;
+        const tickHeight: number = 5;
 
         // # add tick on line
         const addTick: boolean = kw.tick || true;
         if (addTick) {
             const stroke: string = kw.stroke || Colors.black;
-            const line = this.drawing.line(x, -dy, x, dy)
+            const line = this.drawing.line(x, -tickHeight, x, tickHeight)
                 .stroke({ color: stroke, width: 2 });
 
             this.axisGroup.add(line);
         }
 
         // # add label
-        /*
-         #self.drawing.text(label, insert=(x, -2 * dy), stroke='none', fill=fill, font_family='Helevetica',
-         ##font_size='6pt', text_anchor='end', writing_mode='tb', transform=transform))
-         */
-        //writing mode?
+        // Offset to center the text on the tick
+        const bar = 1.2 * Timeline.fontSize;
+
+        // Distance between the x axis and text
+        const foo = 2 * tickHeight;
 
         const txt = this.drawing.text(label);
         txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
         txt.transform({ rotate: 270, ox: x, oy: 0 });
-        txt.dx(x - 7).dy((-2 * dy) + 5);
+        txt.dx(x - foo).dy(-bar);
 
         txt.fill(fill);
 
         this.axisGroup.add(txt);
 
-        const h = Timeline.getTextWidth('Helevetica', Timeline.fontSize, label) + 2 * dy;
+        const h = Timeline.getTextWidth('Helevetica', Timeline.fontSize, label) + foo;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
 
     }
@@ -520,13 +520,13 @@ export class Timeline {
 
             this.axisGroup.add(pth);
 
-            const foo = 6;
+            const bar = Timeline.fontSize * 1.5;
 
             const txt = this.drawing.text(event);
             txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);
 
             // TODO wut
-            txt.dy(y - 4 * Timeline.textFudge[1] - foo);
+            txt.dy(y - bar);
             txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
 
@@ -654,7 +654,7 @@ export class Timeline {
             // Era title
             const txt = this.drawing.text(name);
             txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'middle' });
-            txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.textFudge[1] - 9);
+            txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.fontSize * 2);
             txt.fill(fill);
 
             this.drawing.add(txt);
@@ -684,7 +684,8 @@ export class Timeline {
         const yAxis: number = yEra + Timeline.calloutProperties.height - yCallouts;
 
         //# determine height so that eras, callouts, axis, and labels just fit
-        const height: number = yAxis + this.maxLabelHeight + 4 * Timeline.textFudge[1];
+
+        const height: number = yAxis + this.maxLabelHeight + Timeline.fontSize;
 
         //# create eras and labels using axis height and overall height
         this.createEras(yEra, yAxis, height);
