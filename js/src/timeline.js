@@ -126,7 +126,7 @@ export class Timeline {
                 console.warn([callout, calloutDate, OoBDate]);
                 continue;
             }
-            const leftBoundary = Timeline.calculateEventLeftBondary(callout.description, x);
+            const leftBoundary = Timeline.calculateEventLeftBoundary(callout.description, x);
             minX = Math.min(minX, leftBoundary);
         }
         // clamp to a positive value
@@ -180,12 +180,12 @@ export class Timeline {
         // Distance between the x axis and text
         const foo = 2 * tickHeight;
         const txt = this.drawing.text(label);
-        txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
+        txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
         txt.transform({ rotate: 270, ox: x, oy: 0 });
         txt.dx(x - foo).dy(-bar);
         txt.fill(fill);
         this.axisGroup.add(txt);
-        const h = Timeline.getTextWidth('Helevetica', Timeline.fontSize, label) + foo;
+        const h = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, label) + foo;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
     }
     ///
@@ -203,7 +203,7 @@ export class Timeline {
     // Approximates a place to break a string into two
     // pure fn
     // Returns two strings if a split is found, else null.
-    static bifercateString(str) {
+    static bifurcateString(str) {
         const cuttingRangeStart = Math.floor(str.length * 0.33);
         const cuttingRangeEnd = str.length * 0.66;
         const half = Math.floor(str.length / 2);
@@ -243,22 +243,23 @@ export class Timeline {
         }
         return level;
     }
-    static calculateEventLeftBondary(event, eventEndpoint) {
-        const textWidth = Timeline.getTextWidth('Helevetica', Timeline.fontSize, event);
-        const leftBoundary = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+    static calculateEventLeftBoundary(event, eventEndpoint) {
+        const textWidth = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, event);
+        const extraFudge = 4; // Why is this needed?
+        const leftBoundary = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge + extraFudge);
         return leftBoundary;
     }
     //not pure fn
     //modifies prev*
     static calculateCalloutHeight(eventEndpoint, prevEndpoints, prevLevels, event) {
         //ensure text does not overlap with previous entries
-        const leftBoundary = Timeline.calculateEventLeftBondary(event, eventEndpoint);
+        const leftBoundary = Timeline.calculateEventLeftBoundary(event, eventEndpoint);
         let level = Timeline.calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels);
-        const bif = Timeline.bifercateString(event);
+        const bif = Timeline.bifurcateString(event);
         if (bif) {
             //longest of 2 stings
             const bifEvent = maxString(bif[0], bif[1]);
-            const bifBoundary = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
+            const bifBoundary = Timeline.calculateEventLeftBoundary(bifEvent, eventEndpoint);
             // occupying 2 lines → +1
             const bifLevel = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
             //compare levels somehow
@@ -309,10 +310,10 @@ export class Timeline {
             this.axisGroup.add(pth);
             const bar = Timeline.fontSize * 1.5;
             const txt = this.drawing.text(event);
-            txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);
+            txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge);
             // TODO wut
             txt.dy(y - bar);
-            txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
+            txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
             this.axisGroup.add(txt);
             if (x - lastLabelX > Timeline.fontSize) {
@@ -399,7 +400,7 @@ export class Timeline {
                 .stroke({ color: fill, width: 0.75 }));
             // Era title
             const txt = this.drawing.text(name);
-            txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'middle' });
+            txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'middle' });
             txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.fontSize * 2);
             txt.fill(fill);
             this.drawing.add(txt);
@@ -438,13 +439,14 @@ export class Timeline {
     }
 }
 Timeline.fontSize = 6;
+Timeline.fontFamily = 'Helvetica';
 Timeline.calloutProperties = {
     width: 10,
     height: 15,
     increment: 10
 };
 // x,y of adjustment of callout text
-Timeline.textFudge = [3, 0.5];
+Timeline.textFudge = 3;
 //
 //
 //

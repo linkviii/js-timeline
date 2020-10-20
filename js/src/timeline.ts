@@ -183,6 +183,7 @@ class OoBDate extends Error {
 export class Timeline {
 
     public static readonly fontSize = 6;
+    public static readonly fontFamily = 'Helvetica';
 
     public static readonly calloutProperties: { width: number, height: number, increment: number } = {
         width: 10,
@@ -190,7 +191,7 @@ export class Timeline {
         increment: 10
     };
     // x,y of adjustment of callout text
-    public static readonly textFudge: [number, number] = [3, 0.5];
+    public static readonly textFudge: number = 3;
 
 
     public readonly data: TimelineDataV2;
@@ -265,7 +266,7 @@ export class Timeline {
                 continue;
             }
 
-            const leftBoundary: number = Timeline.calculateEventLeftBondary(callout.description, x);
+            const leftBoundary: number = Timeline.calculateEventLeftBoundary(callout.description, x);
             minX = Math.min(minX, leftBoundary);
         }
 
@@ -339,7 +340,7 @@ export class Timeline {
         const foo = 2 * tickHeight;
 
         const txt = this.drawing.text(label);
-        txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
+        txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
         txt.transform({ rotate: 270, ox: x, oy: 0 });
         txt.dx(x - foo).dy(-bar);
 
@@ -347,7 +348,7 @@ export class Timeline {
 
         this.axisGroup.add(txt);
 
-        const h = Timeline.getTextWidth('Helevetica', Timeline.fontSize, label) + foo;
+        const h = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, label) + foo;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
 
     }
@@ -375,7 +376,7 @@ export class Timeline {
     // Approximates a place to break a string into two
     // pure fn
     // Returns two strings if a split is found, else null.
-    private static bifercateString(str: string): [string, string] | null {
+    private static bifurcateString(str: string): [string, string] | null {
         const cuttingRangeStart = Math.floor(str.length * 0.33);
         const cuttingRangeEnd = str.length * 0.66;
 
@@ -428,9 +429,10 @@ export class Timeline {
         return level;
     }
 
-    private static calculateEventLeftBondary(event: string, eventEndpoint: number): number {
-        const textWidth: number = Timeline.getTextWidth('Helevetica', Timeline.fontSize, event);
-        const leftBoundary: number = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge[0]);
+    private static calculateEventLeftBoundary(event: string, eventEndpoint: number): number {
+        const textWidth: number = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, event);
+        const extraFudge = 4; // Why is this needed?
+        const leftBoundary: number = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge + extraFudge);
 
         return leftBoundary;
     }
@@ -442,17 +444,17 @@ export class Timeline {
 
         //ensure text does not overlap with previous entries
 
-        const leftBoundary: number = Timeline.calculateEventLeftBondary(event, eventEndpoint);
+        const leftBoundary: number = Timeline.calculateEventLeftBoundary(event, eventEndpoint);
 
         let level: number = Timeline.calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels);
 
 
-        const bif = Timeline.bifercateString(event);
+        const bif = Timeline.bifurcateString(event);
         if (bif) {
 
             //longest of 2 stings
             const bifEvent: string = maxString(bif[0], bif[1]);
-            const bifBoundary: number = Timeline.calculateEventLeftBondary(bifEvent, eventEndpoint);
+            const bifBoundary: number = Timeline.calculateEventLeftBoundary(bifEvent, eventEndpoint);
             // occupying 2 lines → +1
             const bifLevel: number = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
             //compare levels somehow
@@ -523,11 +525,11 @@ export class Timeline {
             const bar = Timeline.fontSize * 1.5;
 
             const txt = this.drawing.text(event);
-            txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge[0]);
+            txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge);
 
             // TODO wut
             txt.dy(y - bar);
-            txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'end' });
+            txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
 
             this.axisGroup.add(txt);
@@ -653,7 +655,7 @@ export class Timeline {
 
             // Era title
             const txt = this.drawing.text(name);
-            txt.font({ family: 'Helevetica', size: `${Timeline.fontSize}pt`, anchor: 'middle' });
+            txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'middle' });
             txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.fontSize * 2);
             txt.fill(fill);
 
