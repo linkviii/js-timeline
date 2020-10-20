@@ -21,10 +21,10 @@ function max(x, y, fn) {
         return y;
     }
 }
-function maxString(a, b) {
-    return max(a, b, function (val) {
-        return val.length;
-    });
+// This is not equal to longest display length
+// for non monospaced fonts
+function maxStringChars(a, b) {
+    return max(a, b, val => val.length);
 }
 //
 export const Colors = { black: '#000000', gray: '#C0C0C0' };
@@ -249,16 +249,16 @@ export class Timeline {
         const leftBoundary = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge + extraFudge);
         return leftBoundary;
     }
-    //not pure fn
-    //modifies prev*
+    // not pure fn
+    // modifies prev*
     static calculateCalloutHeight(eventEndpoint, prevEndpoints, prevLevels, event) {
-        //ensure text does not overlap with previous entries
+        // ensure text does not overlap with previous entries
         const leftBoundary = Timeline.calculateEventLeftBoundary(event, eventEndpoint);
         let level = Timeline.calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels);
         const bif = Timeline.bifurcateString(event);
         if (bif) {
             //longest of 2 stings
-            const bifEvent = maxString(bif[0], bif[1]);
+            const bifEvent = max(bif[0], bif[1], val => Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, val));
             const bifBoundary = Timeline.calculateEventLeftBoundary(bifEvent, eventEndpoint);
             // occupying 2 lines → +1
             const bifLevel = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
@@ -413,7 +413,7 @@ export class Timeline {
     build() {
         //# MAGIC NUMBER: y_era
         //# draw era label and markers at this height
-        const yEra = 10;
+        const yEra = 5 + Timeline.fontSize;
         //# create main axis and callouts,
         //# keeping track of how high the callouts are
         this.createMainAxis();
@@ -438,12 +438,12 @@ export class Timeline {
         return w;
     }
 }
-Timeline.fontSize = 6;
+Timeline.fontSize = 8;
 Timeline.fontFamily = 'Helvetica';
 Timeline.calloutProperties = {
     width: 10,
     height: 15,
-    increment: 10
+    increment: Timeline.fontSize * 1.75
 };
 // x,y of adjustment of callout text
 Timeline.textFudge = 3;
