@@ -283,8 +283,8 @@ export class Timeline {
 
     private createMainAxis(): void {
         //# draw main line
-        this.axisGroup.add(this.drawing.line(0, 0, this.width, 0)
-            .stroke({ color: Colors.black, width: 3 }));
+        this.axisGroup.line(0, 0, this.width, 0)
+            .stroke({ color: Colors.black, width: 3 });
 
     }
 
@@ -330,10 +330,9 @@ export class Timeline {
         const addTick: boolean = kw.tick || true;
         if (addTick) {
             const stroke: string = kw.stroke || Colors.black;
-            const line = this.drawing.line(x, -tickHeight, x, tickHeight)
+            const line = this.axisGroup.line(x, -tickHeight, x, tickHeight)
                 .stroke({ color: stroke, width: 2 });
 
-            this.axisGroup.add(line);
         }
 
         // # add label
@@ -343,14 +342,13 @@ export class Timeline {
         // Distance between the x axis and text
         const foo = 2 * tickHeight;
 
-        const txt = this.drawing.text(label);
+        const txt = this.axisGroup.text(label);
         txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
         txt.transform({ rotate: 270, ox: x, oy: 0 });
         txt.dx(x - foo).dy(-bar);
 
         txt.fill(fill);
 
-        this.axisGroup.add(txt);
 
         const h = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, label) + foo;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
@@ -523,14 +521,13 @@ export class Timeline {
             //svg elements
             const pathData: string = ['M', x, ',', 0, ' L', x, ',', y, ' L',
                 (x - Timeline.calloutProperties.width), ',', y].join("");
-            const pth = this.drawing.path(pathData).stroke({ color: eventColor, width: 1, fill: "none" });
+            const pth = this.axisGroup.path(pathData).stroke({ color: eventColor, width: 1, fill: "none" });
             pth.fill("none", 0);
 
-            this.axisGroup.add(pth);
 
             const bar = Timeline.fontSize * 1.5;
 
-            const txt = this.drawing.text(event);
+            const txt = this.axisGroup.text(event);
             txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge);
 
             // TODO wut
@@ -538,15 +535,13 @@ export class Timeline {
             txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
 
-            this.axisGroup.add(txt);
 
             if (x - lastLabelX > Timeline.fontSize) {
                 lastLabelX = x;
                 this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
             }
-            const circ = this.drawing.circle(8).attr({ fill: 'white', cx: x, cy: 0, stroke: eventColor });
+            const circ = this.axisGroup.circle(8).attr({ fill: 'white', cx: x, cy: 0, stroke: eventColor });
 
-            this.axisGroup.add(circ);
 
 
         }
@@ -617,7 +612,8 @@ export class Timeline {
             const fill: string = era.color || Colors.gray;
 
 
-            const [startMarker, endMarker] = this.getMarkers(fill);
+            // Don't actually know what this was supposed to do 
+            // const [startMarker, endMarker] = this.getMarkers(fill);
 
             //# create boundary lines
             //if date isn't in bounds, something interesting will happen
@@ -633,31 +629,20 @@ export class Timeline {
             rect.x(x0);
             rect.fill({ color: fill, opacity: 0.15 });
 
-            this.drawing.add(rect);
 
             // Boundary lines
-            const line0 = this.drawing.add(
-                this.drawing.line(x0, 0, x0, yAxis)
-                    .stroke({ color: fill, width: 0.5 })
-            );
+            //  line0 
+            this.drawing.line(x0, 0, x0, yAxis)
+                .stroke({ color: fill, width: 0.5 });
 
-            //TODO line0 line1 dash
-            //http://svgwrite.readthedocs.io/en/latest/classes/mixins.html#svgwrite.mixins.Presentation.dasharray
-            //line0.dasharray([5, 5])
-            //what the svgjs equiv?
 
-            const line1 = this.drawing.add(
-                this.drawing.line(x1, 0, x1, yAxis)
-                    .stroke({ color: fill, width: 0.5 })
-            );
-            //line1.dasharray([5, 5])
-
+            // line1 
+            this.drawing.line(x1, 0, x1, yAxis)
+                .stroke({ color: fill, width: 0.5 });
 
             //# create horizontal arrows and text
-            const horz = this.drawing.add(
-                this.drawing.line(x0, yEra, x1, yEra)
-                    .stroke({ color: fill, width: 0.75 })
-            );
+            this.drawing.line(x0, yEra, x1, yEra)
+                .stroke({ color: fill, width: 0.75 });
 
             // Era title
             const txt = this.drawing.text(name);
@@ -665,7 +650,6 @@ export class Timeline {
             txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.fontSize * 2);
             txt.fill(fill);
 
-            this.drawing.add(txt);
 
             // axis dates
             this.addAxisLabel(t0);
@@ -701,7 +685,6 @@ export class Timeline {
         //# translate the axis group and add it to the drawing
         // this.axisGroup.translate(0, yAxis);
         this.axisGroup.translate(this.extraWidth, yAxis);
-        this.drawing.add(this.axisGroup);
 
         // this.drawing.size(this.width, height);
         this.drawing.size(this.width + this.extraWidth, height);
