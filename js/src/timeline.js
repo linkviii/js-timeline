@@ -26,6 +26,9 @@ function max(x, y, fn) {
 function maxStringChars(a, b) {
     return max(a, b, val => val.length);
 }
+function compareDateStr(a, b) {
+    return new Date(a).valueOf() - new Date(b).valueOf();
+}
 //
 export const Colors = { black: '#000000', gray: '#C0C0C0' };
 //probably "shouldn't" be a class but whatever. converter namespace
@@ -93,6 +96,8 @@ export class Timeline {
     // initializes data for timeline
     // Call `build` to generate svg
     constructor(data, id) {
+        this.fontSize = 8;
+        this.fontFamily = 'Helvetica';
         if (data.apiVersion == 2) {
             this.data = data;
         }
@@ -113,6 +118,23 @@ export class Timeline {
         this.tickFormat = this.data.tickFormat;
         //TODO use a map instead
         this.markers = {};
+        //
+        // Needs to happen after initializing drawing
+        const tmpTxt = this.drawing.text("|").font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
+        const tmpBox = tmpTxt.bbox();
+        this.fontHeight = Math.ceil(tmpBox.height);
+        console.log(this.fontHeight);
+        this.calloutProperties = {
+            width: 10,
+            height: 15,
+            increment: this.fontHeight
+        };
+        //
+        //
+        //
+        if (this.data.eras) {
+            this.data.eras.sort((a, b) => compareDateStr(a.endDate, b.endDate));
+        }
         //# maxLabelHeight stores the max height of all axis labels
         //# and is used in the final height computation in build(self)
         this.maxLabelHeight = 0;
@@ -126,7 +148,7 @@ export class Timeline {
                 console.warn([callout, calloutDate, OoBDate]);
                 continue;
             }
-            const leftBoundary = Timeline.calculateEventLeftBoundary(callout.description, x);
+            const leftBoundary = this.calculateEventLeftBoundary(callout.description, x);
             minX = Math.min(minX, leftBoundary);
         }
         // clamp to a positive value
@@ -176,28 +198,22 @@ export class Timeline {
         }
         // # add label
         // Offset to center the text on the tick
-        const bar = 1.2 * Timeline.fontSize;
+        const bar = this.fontHeight;
         // Distance between the x axis and text
         const foo = 2 * tickHeight;
         const txt = this.axisGroup.text(label);
-        txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
+        txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
         txt.transform({ rotate: 270, ox: x, oy: 0 });
         txt.dx(x - foo).dy(-bar);
         txt.fill(fill);
-        const h = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, label) + foo;
+        const h = txt.bbox().width + foo;
         this.maxLabelHeight = Math.max(this.maxLabelHeight, h);
     }
     ///
     // Callout generating functions
     ///
     sortCallouts() {
-        this.data.callouts.sort(function (a, b) {
-            const tmpA = a.date;
-            const eventDateA = (new Date(tmpA)).valueOf();
-            const tmpB = b.date;
-            const eventDateB = (new Date(tmpB)).valueOf();
-            return eventDateA - eventDateB;
-        });
+        this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
     }
     // Approximates a place to break a string into two
     // pure fn
@@ -242,23 +258,23 @@ export class Timeline {
         }
         return level;
     }
-    static calculateEventLeftBoundary(event, eventEndpoint) {
-        const textWidth = Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, event);
-        const extraFudge = 4; // Why is this needed?
-        const leftBoundary = eventEndpoint - (textWidth + Timeline.calloutProperties.width + Timeline.textFudge + extraFudge);
+    calculateEventLeftBoundary(event, eventEndpoint) {
+        const textWidth = this.getTextWidth2(event);
+        const extraFudge = 0; // Why is this needed?
+        const leftBoundary = eventEndpoint - (textWidth + this.calloutProperties.width + Timeline.textFudge + extraFudge);
         return leftBoundary;
     }
     // not pure fn
     // modifies prev*
-    static calculateCalloutHeight(eventEndpoint, prevEndpoints, prevLevels, event) {
+    calculateCalloutHeight(eventEndpoint, prevEndpoints, prevLevels, event) {
         // ensure text does not overlap with previous entries
-        const leftBoundary = Timeline.calculateEventLeftBoundary(event, eventEndpoint);
+        const leftBoundary = this.calculateEventLeftBoundary(event, eventEndpoint);
         let level = Timeline.calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels);
         const bif = Timeline.bifurcateString(event);
         if (bif) {
             //longest of 2 stings
-            const bifEvent = max(bif[0], bif[1], val => Timeline.getTextWidth(Timeline.fontFamily, Timeline.fontSize, val));
-            const bifBoundary = Timeline.calculateEventLeftBoundary(bifEvent, eventEndpoint);
+            const bifEvent = max(bif[0], bif[1], val => this.getTextWidth2(val));
+            const bifBoundary = this.calculateEventLeftBoundary(bifEvent, eventEndpoint);
             // occupying 2 lines → +1
             const bifLevel = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
             //compare levels somehow
@@ -267,7 +283,7 @@ export class Timeline {
                 event = bif.join("\n");
             }
         }
-        const calloutHeight = level * Timeline.calloutProperties.increment;
+        const calloutHeight = level * this.calloutProperties.increment;
         prevEndpoints.push(eventEndpoint);
         prevLevels.push(level);
         return [calloutHeight, event];
@@ -298,22 +314,22 @@ export class Timeline {
                 continue;
             }
             //# figure out what 'level" to make the callout on
-            const [calloutHeight, event] = Timeline.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
-            const y = 0 - Timeline.calloutProperties.height - calloutHeight;
+            const [calloutHeight, event] = this.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
+            const y = 0 - this.calloutProperties.height - calloutHeight;
             minY = Math.min(minY, y);
             //svg elements
             const pathData = ['M', x, ',', 0, ' L', x, ',', y, ' L',
-                (x - Timeline.calloutProperties.width), ',', y].join("");
+                (x - this.calloutProperties.width), ',', y].join("");
             const pth = this.axisGroup.path(pathData).stroke({ color: eventColor, width: 1, fill: "none" });
             pth.fill("none", 0);
-            const bar = Timeline.fontSize * 1.5;
+            const bar = this.fontHeight;
             const txt = this.axisGroup.text(event);
-            txt.dx(x - Timeline.calloutProperties.width - Timeline.textFudge);
+            txt.dx(x - this.calloutProperties.width - Timeline.textFudge);
             // TODO wut
             txt.dy(y - bar);
-            txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'end' });
+            txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
-            if (x - lastLabelX > Timeline.fontSize) {
+            if (x - lastLabelX > this.fontHeight) {
                 lastLabelX = x;
                 this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
             }
@@ -359,6 +375,14 @@ export class Timeline {
         return [startMarker, endMarker];
     }
     ;
+    giveTxtBackground(txt, fill) {
+        const bbox = txt.bbox();
+        let rect = this.drawing.rect(bbox.width, bbox.height).fill(fill);
+        rect.move(txt.x(), txt.y());
+        rect.backward();
+        rect.radius(2);
+        return rect;
+    }
     createEras(yEra, yAxis, height) {
         if (!('eras' in this.data)) {
             return;
@@ -393,8 +417,8 @@ export class Timeline {
                 .stroke({ color: fill, width: 0.75 });
             // Era title
             const txt = this.drawing.text(name);
-            txt.font({ family: Timeline.fontFamily, size: `${Timeline.fontSize}pt`, anchor: 'middle' });
-            txt.dx(0.5 * (x0 + x1)).dy(yEra - Timeline.fontSize * 2);
+            txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'middle' });
+            txt.dx(0.5 * (x0 + x1)).dy(yEra - this.fontHeight - 2);
             txt.fill(fill);
             // axis dates
             this.addAxisLabel(t0);
@@ -405,17 +429,19 @@ export class Timeline {
     build() {
         //# MAGIC NUMBER: y_era
         //# draw era label and markers at this height
-        const yEra = 5 + Timeline.fontSize;
+        // const yEra: number = 5 + this.fontHeight;
+        const yEra = 0 + this.fontHeight;
         //# create main axis and callouts,
         //# keeping track of how high the callouts are
         this.createMainAxis();
         const yCallouts = this.createCallouts();
         this.createDateTicks();
         //# determine axis position so that axis + callouts don't overlap with eras
-        const yAxis = yEra + Timeline.calloutProperties.height - yCallouts;
+        const yAxis = yEra + this.calloutProperties.height - yCallouts;
         //# determine height so that eras, callouts, axis, and labels just fit
-        const height = yAxis + this.maxLabelHeight + Timeline.fontSize;
+        const height = yAxis + this.maxLabelHeight + this.fontHeight;
         //# create eras and labels using axis height and overall height
+        // TODO Move eras under other elm
         this.createEras(yEra, yAxis, height);
         //# translate the axis group and add it to the drawing
         // this.axisGroup.translate(0, yAxis);
@@ -423,25 +449,19 @@ export class Timeline {
         // this.drawing.size(this.width, height);
         this.drawing.size(this.width + this.extraWidth, height);
     }
-    static getTextWidth(family, size, text) {
-        //use canvas to measure text width
-        const ctx = Timeline.canvas.getContext("2d");
-        ctx.font = size + "pt " + family;
-        const w = ctx.measureText(text).width;
-        return w;
+    //
+    //
+    //
+    getTextWidth2(text, anchor) {
+        anchor = anchor || 'end';
+        const txt = this.drawing.text(text);
+        txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: anchor });
+        const box = txt.bbox();
+        txt.remove();
+        // The box seems fuzzy so lets give a small amount of padding.
+        return Math.ceil(box.width) + 1;
     }
 }
-Timeline.fontSize = 8;
-Timeline.fontFamily = 'Helvetica';
-Timeline.calloutProperties = {
-    width: 10,
-    height: 15,
-    increment: Timeline.fontSize * 1.75
-};
 // x,y of adjustment of callout text
 Timeline.textFudge = 3;
-//
-//
-//
-Timeline.canvas = document.createElement('canvas');
 //# sourceMappingURL=timeline.js.map
