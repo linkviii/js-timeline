@@ -273,7 +273,7 @@ export class Timeline {
         this.calloutProperties = {
             width: 10,
             height: 15,
-            increment: this.fontHeight
+            increment: this.fontHeight * 1.2
         };
 
         //
@@ -513,6 +513,44 @@ export class Timeline {
     }
 
 
+    /* endpointMap: For each level, the list of endpoints on that level*/
+    private calculateCalloutHeight2(eventEndpoint: number, endpointMap: Array<Array<number>>, event: string): [number, string] {
+
+
+        // ensure text does not overlap with previous entries
+
+        const leftBoundary: number = this.calculateEventLeftBoundary(event, eventEndpoint);
+
+        let level: number = 0; // Valid levels start at 1
+
+        for (let levI = 0; levI < endpointMap.length; levI++) {
+            let row = endpointMap[levI];
+            if (row.length == 0) {
+                level = levI + 1;
+                break;
+            }
+            if (row[row.length - 1] < leftBoundary) {
+                level = levI + 1;
+                break;
+            }
+        }
+        if (level == 0) {
+            level = endpointMap.length;
+        }
+
+        // Select level
+        while (level >= endpointMap.length) {
+            endpointMap.push([]);
+        }
+        endpointMap[level -1].push(eventEndpoint);
+
+        const calloutHeight = level * this.calloutProperties.increment;
+
+
+
+        return [calloutHeight, event];
+    }
+
     /**
      * Adds callouts and calculates the height needed.
      *
@@ -528,6 +566,9 @@ export class Timeline {
         //# add callouts, one by one, making sure they don't overlap
         let prevX: number[] = [-Infinity];
         let prevLevel: number[] = [-1];
+
+        let endpointMap = [[]];
+
         //vertical drawing up is negative ~= max height
         let minY = Infinity;
 
@@ -551,11 +592,13 @@ export class Timeline {
             if (bgEra) {
                 bgColor = bgEra.color || Colors.gray;
             }
-            const bgFill = { color: bgColor, opacity: 0.15 };
+            // const bgFill = { color: bgColor, opacity: 0.15 };
+            const bgFill = { color: bgColor, opacity:1 };
 
 
             //# figure out what 'level" to make the callout on
-            const [calloutHeight, event]: [number, string] = this.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
+            // const [calloutHeight, event]: [number, string] = this.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
+            const [calloutHeight, event]: [number, string] = this.calculateCalloutHeight2(x, endpointMap, callout.description);
             const y: number = 0 - this.calloutProperties.height - calloutHeight;
             minY = Math.min(minY, y);
 
