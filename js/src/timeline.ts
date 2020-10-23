@@ -516,20 +516,31 @@ export class Timeline {
     /* endpointMap: For each level, the list of endpoints on that level*/
     private calculateCalloutHeight2(eventEndpoint: number, endpointMap: Array<Array<number>>, event: string): [number, string] {
 
+        // TODO: Clean this up. It's nasty down here
 
         // ensure text does not overlap with previous entries
 
-        const leftBoundary: number = this.calculateEventLeftBoundary(event, eventEndpoint);
+        const leftPad = this.calloutProperties.width;
+        const leftBoundary: number = this.calculateEventLeftBoundary(event, eventEndpoint) - leftPad;
+
 
         let level: number = 0; // Valid levels start at 1
 
+        const isGood = function (row) {
+            if (row) {
+                if (row.length == 0 || row[row.length - 1] < leftBoundary) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else { return true; }
+        };
+
+        //
+
         for (let levI = 0; levI < endpointMap.length; levI++) {
-            let row = endpointMap[levI];
-            if (row.length == 0) {
-                level = levI + 1;
-                break;
-            }
-            if (row[row.length - 1] < leftBoundary) {
+
+            if (isGood(endpointMap[levI]) && isGood(endpointMap[levI + 1])) {
                 level = levI + 1;
                 break;
             }
@@ -538,17 +549,67 @@ export class Timeline {
             level = endpointMap.length;
         }
 
-        // Select level
-        while (level >= endpointMap.length) {
-            endpointMap.push([]);
+        // ---------
+
+        const bif = Timeline.bifurcateString(event);
+        let bifLevel = 0;
+        if (bif) {
+            const bifEvent: string = max(bif[0], bif[1],
+                val => this.getTextWidth2(val));
+            const leftBoundary: number = this.calculateEventLeftBoundary(bifEvent, eventEndpoint) - leftPad;
+
+            const isGood = function (row) {
+                if (row) {
+                    if (row.length == 0 || row[row.length - 1] < leftBoundary) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else { return true; }
+            };
+
+            for (let levI = 1; levI < endpointMap.length; levI++) {
+
+                if (isGood(endpointMap[levI-1]) &&isGood(endpointMap[levI]) && isGood(endpointMap[levI + 1])) {
+                    bifLevel = levI + 1;
+                    break;
+                }
+            }
+            if (bifLevel == 0) {
+                bifLevel = endpointMap.length;
+            }
         }
-        endpointMap[level -1].push(eventEndpoint);
 
-        const calloutHeight = level * this.calloutProperties.increment;
+        // Select level
+        //
+        if (bifLevel != 0 && bifLevel < level) {
 
 
+            while (bifLevel >= endpointMap.length) {
+                endpointMap.push([]);
+            }
+            endpointMap[bifLevel - 1].push(eventEndpoint);
+            if (bifLevel != 1) {
+                endpointMap[bifLevel - 2].push(eventEndpoint);
 
-        return [calloutHeight, event];
+            }
+
+            const calloutHeight = bifLevel * this.calloutProperties.increment;
+            event = bif.join("\n");
+
+
+            return [calloutHeight, event];
+        } else {
+
+            while (level >= endpointMap.length) {
+                endpointMap.push([]);
+            }
+            endpointMap[level - 1].push(eventEndpoint);
+
+            const calloutHeight = level * this.calloutProperties.increment;
+
+            return [calloutHeight, event];
+        }
     }
 
     /**
@@ -593,7 +654,7 @@ export class Timeline {
                 bgColor = bgEra.color || Colors.gray;
             }
             // const bgFill = { color: bgColor, opacity: 0.15 };
-            const bgFill = { color: bgColor, opacity:1 };
+            const bgFill = { color: bgColor, opacity: 1 };
 
 
             //# figure out what 'level" to make the callout on
