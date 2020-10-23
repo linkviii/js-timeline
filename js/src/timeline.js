@@ -29,6 +29,13 @@ function maxStringChars(a, b) {
 function compareDateStr(a, b) {
     return new Date(a).valueOf() - new Date(b).valueOf();
 }
+function intersect(start, end, other, evaler) {
+    evaler = evaler || (x => x);
+    const otherVal = evaler(other);
+    return evaler(start) <= otherVal && otherVal <= evaler(end);
+}
+//
+//
 //
 export const Colors = { black: '#000000', gray: '#C0C0C0' };
 //probably "shouldn't" be a class but whatever. converter namespace
@@ -123,7 +130,6 @@ export class Timeline {
         const tmpTxt = this.drawing.text("|").font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
         const tmpBox = tmpTxt.bbox();
         this.fontHeight = Math.ceil(tmpBox.height);
-        console.log(this.fontHeight);
         this.calloutProperties = {
             width: 10,
             height: 15,
@@ -214,6 +220,16 @@ export class Timeline {
     ///
     sortCallouts() {
         this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
+    }
+    eraOfDate(date) {
+        if (this.data.eras) {
+            for (let era of this.data.eras) {
+                if (intersect(new Date(era.startDate), new Date(era.endDate), date, x => x.valueOf())) {
+                    return era;
+                }
+            }
+        }
+        return null;
     }
     // Approximates a place to break a string into two
     // pure fn
@@ -313,6 +329,12 @@ export class Timeline {
                 // console.warn([callout, calloutDate, OoBDate]);
                 continue;
             }
+            const bgEra = this.eraOfDate(calloutDate);
+            let bgColor = "white";
+            if (bgEra) {
+                bgColor = bgEra.color || Colors.gray;
+            }
+            const bgFill = { color: bgColor, opacity: 0.15 };
             //# figure out what 'level" to make the callout on
             const [calloutHeight, event] = this.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
             const y = 0 - this.calloutProperties.height - calloutHeight;
@@ -329,6 +351,7 @@ export class Timeline {
             txt.dy(y - bar);
             txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
+            this.giveTxtBackground(txt, bgFill);
             if (x - lastLabelX > this.fontHeight) {
                 lastLabelX = x;
                 this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
@@ -377,9 +400,12 @@ export class Timeline {
     ;
     giveTxtBackground(txt, fill) {
         const bbox = txt.bbox();
-        let rect = this.drawing.rect(bbox.width, bbox.height).fill(fill);
+        // let rect = this.drawing.rect(bbox.width, bbox.height).fill(fill);
+        let rect = txt.parent().rect(bbox.width, bbox.height).fill(fill);
         rect.move(txt.x(), txt.y());
         rect.backward();
+        // rect.put(txt);
+        // txt.replace(rect);
         rect.radius(2);
         return rect;
     }

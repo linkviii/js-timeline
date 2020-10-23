@@ -43,6 +43,15 @@ function compareDateStr(a: string, b: string): number {
     return new Date(a).valueOf() - new Date(b).valueOf();
 }
 
+
+function intersect<T>(start: T, end: T, other: T, evaler?: (T) => any): boolean {
+    evaler = evaler || (x => x);
+    const otherVal = evaler(other);
+    return evaler(start) <= otherVal && otherVal <= evaler(end);
+}
+
+//
+//
 //
 
 export const Colors: { black: string, gray: string } = { black: '#000000', gray: '#C0C0C0' };
@@ -260,7 +269,6 @@ export class Timeline {
         const tmpBox = tmpTxt.bbox();
 
         this.fontHeight = Math.ceil(tmpBox.height);
-        console.log(this.fontHeight);
 
         this.calloutProperties = {
             width: 10,
@@ -388,6 +396,17 @@ export class Timeline {
         this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
 
 
+    }
+
+    eraOfDate(date: Date): TimelineEraV2 | null {
+        if (this.data.eras) {
+            for (let era of this.data.eras) {
+                if (intersect(new Date(era.startDate), new Date(era.endDate), date, x => x.valueOf())) {
+                    return era;
+                }
+            }
+        }
+        return null;
     }
 
     // Approximates a place to break a string into two
@@ -527,6 +546,13 @@ export class Timeline {
                 continue;
             }
 
+            const bgEra = this.eraOfDate(calloutDate);
+            let bgColor = "white";
+            if (bgEra) {
+                bgColor = bgEra.color || Colors.gray;
+            }
+            const bgFill = { color: bgColor, opacity: 0.15 };
+
 
             //# figure out what 'level" to make the callout on
             const [calloutHeight, event]: [number, string] = this.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
@@ -549,6 +575,8 @@ export class Timeline {
             txt.dy(y - bar);
             txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
+
+            this.giveTxtBackground(txt, bgFill);
 
 
             if (x - lastLabelX > this.fontHeight) {
@@ -615,9 +643,13 @@ export class Timeline {
 
     giveTxtBackground(txt, fill): any {
         const bbox = txt.bbox();
-        let rect = this.drawing.rect(bbox.width, bbox.height).fill(fill);
+        // let rect = this.drawing.rect(bbox.width, bbox.height).fill(fill);
+        let rect = txt.parent().rect(bbox.width, bbox.height).fill(fill);
         rect.move(txt.x(), txt.y());
         rect.backward();
+        // rect.put(txt);
+
+        // txt.replace(rect);
         rect.radius(2);
         return rect;
     }
