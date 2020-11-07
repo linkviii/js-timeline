@@ -18,7 +18,10 @@
 declare function SVG();
 
 
-declare function strftime(format: string, date: Date);
+// declare function strftime(format: string, date: Date);
+declare namespace strftime {
+    function utc(): (format: string, date: Date) => string;
+}
 
 // console.info("init strftime");
 // console.info(strftime);
@@ -229,6 +232,9 @@ export class Timeline {
     public readonly drawing;
     public readonly axisGroup;
 
+    //
+    private strfutc = strftime.utc();
+
     // initializes data for timeline
     // Call `build` to generate svg
     constructor(data: TimelineData, id: string) {
@@ -341,7 +347,7 @@ export class Timeline {
         const fill: string = kw.fill || Colors.gray;
         let label: string;
         if (this.tickFormat) {
-            label = strftime(this.tickFormat, dt);
+            label = this.strfutc(this.tickFormat, dt);
         } else {
             label = dt.toDateString();
         }
@@ -570,7 +576,7 @@ export class Timeline {
 
             for (let levI = 1; levI < endpointMap.length; levI++) {
 
-                if (isGood(endpointMap[levI-1]) &&isGood(endpointMap[levI]) && isGood(endpointMap[levI + 1])) {
+                if (isGood(endpointMap[levI - 1]) && isGood(endpointMap[levI]) && isGood(endpointMap[levI + 1])) {
                     bifLevel = levI + 1;
                     break;
                 }
