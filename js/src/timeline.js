@@ -103,8 +103,6 @@ export class Timeline {
     // initializes data for timeline
     // Call `build` to generate svg
     constructor(data, id) {
-        this.fontSize = 8;
-        this.fontFamily = 'Helvetica';
         //
         this.strfutc = strftime.utc();
         if (data.apiVersion == 2) {
@@ -113,6 +111,8 @@ export class Timeline {
         else {
             this.data = TimelineConverter.convertTimelineDataV1ToV2(data);
         }
+        this.fontSize = this.data.fontSize || 8;
+        this.fontFamily = this.data.fontFamily || 'Helvetica';
         this.width = this.data.width;
         this.deadWidth = 0;
         this.drawing = SVG().addTo('#' + id);

@@ -102,6 +102,8 @@ export interface TimelineEraV2 {
 export interface TimelineDataV2 {
     apiVersion: 2;
     width: number;
+    fontSize?: number;
+    fontFamily?: string;
     startDate: string;
     endDate: string;
     numTicks?: number;
@@ -198,8 +200,8 @@ class OoBDate extends Error {
 
 export class Timeline {
 
-    public readonly fontSize = 8;
-    public readonly fontFamily = 'Helvetica';
+    public readonly fontSize;
+    public readonly fontFamily;
     readonly fontHeight: number;
 
     public readonly calloutProperties: { width: number, height: number, increment: number };
@@ -251,6 +253,9 @@ export class Timeline {
             this.data = TimelineConverter.convertTimelineDataV1ToV2(<TimelineDataV1>data);
 
         }
+
+        this.fontSize = this.data.fontSize || 8;
+        this.fontFamily = this.data.fontFamily || 'Helvetica';
 
 
         this.width = this.data.width;
