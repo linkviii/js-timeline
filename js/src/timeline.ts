@@ -267,6 +267,16 @@ export class Timeline {
         this.startDate = new Date(this.data.startDate);
         this.endDate = new Date(this.data.endDate);
 
+        // Create space if otherwise there would be none.
+        if (this.startDate.valueOf() === this.endDate.valueOf()) {
+            this.startDate = new Date(this.startDate.valueOf() - 10000);
+            this.endDate = new Date(this.endDate.valueOf() + 10000);
+        }
+
+        if (this.endDate.valueOf() < this.startDate.valueOf()){
+            throw new Error("startDate is ahead of endDate");
+        }
+
         const timeWindowSpan: number = (this.endDate.valueOf() - this.startDate.valueOf());
 
         // Use the same number of pixels regardless of how wide the timeline is
@@ -310,6 +320,8 @@ export class Timeline {
         //# maxLabelHeight stores the max height of all axis labels
         //# and is used in the final height computation in build(self)
         this.maxLabelHeight = 0;
+
+        this.data.callouts = this.data.callouts || [];
 
         // Calculate how far oob callout text can go
         // leftBoundary < 0 → oob
@@ -497,6 +509,7 @@ export class Timeline {
 
     // not pure fn
     // modifies prev*
+    /** Layout callouts so that text will not overlap with vertical lines. */
     private calculateCalloutHeight(eventEndpoint: number, prevEndpoints: number[], prevLevels: number[], event: string): [number, string] {
 
 
@@ -715,6 +728,10 @@ export class Timeline {
 
         }
 
+        if (!isFinite(minY)) {
+            minY = 10;
+        }
+
         return minY;
 
     }
@@ -897,7 +914,7 @@ export class Timeline {
 }
 
 
-
+// Test linear spacing of callouts
 export function makeTestPattern1(width: number): TimelineDataV2 {
     const testPattern_1: TimelineDataV2 = {
         apiVersion: 2,
@@ -911,7 +928,7 @@ export function makeTestPattern1(width: number): TimelineDataV2 {
             for (let i = 0; i < 8; ++i) {
                 callouts.push({
                     description: alpha[i],
-                    date: `2019-01-${(i + 2).toString().padStart(2, "0")}`
+                    date: `2019-01-${(i + 2).toString().padStart(2, "0")}`,
                 });
             }
             return callouts;
@@ -922,4 +939,30 @@ export function makeTestPattern1(width: number): TimelineDataV2 {
 
 }
 
+// Test no callouts
+export function makeTestPattern2(): TimelineDataV2 {
+    const tln: TimelineDataV2 = {
+        apiVersion: 2,
+        width: 1000,
+        tickFormat: "%Y-%m-%d ",
+        startDate: "2019-01-01",
+        endDate: "2019-01-03",
+    };
+
+    return tln;
+}
+
+
+export function makeTestPattern3(): TimelineDataV2 {
+    const tln: TimelineDataV2 = {
+        apiVersion: 2,
+        width: 1000,
+        tickFormat: "%Y-%m-%d ",
+        startDate: "2019-01-01",
+        endDate: "2019-01-01",
+        callouts: [{ description: "ahh", date: "2019-01-01" }],
+    };
+
+    return tln;
+}
 

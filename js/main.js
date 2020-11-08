@@ -43,6 +43,10 @@ export const sample_1500 = new Timeline(TL.makeTestPattern1(1500), "sampleTimeli
 sample_500.build();
 sample_1000.build();
 sample_1500.build();
+export const test_2 = new Timeline(TL.makeTestPattern2(), "sampleTimeline");
+test_2.build();
+export const test_3 = new Timeline(TL.makeTestPattern3(), "sampleTimeline");
+test_3.build();
 export const t2 = new Timeline(bar, "animeTimeline");
 t2.build();
 //# sourceMappingURL=main.js.map
