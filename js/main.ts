@@ -6,10 +6,12 @@
  */
 
 
-import {Timeline, TimelineData} from "./src/timeline.js";
+import { Timeline, TimelineData } from "./src/timeline.js";
+
+import * as TL from "./src/timeline.js";
 
 
-import  "./jquery.js";
+import "./jquery.js";
 
 declare function SVG();
 
@@ -35,7 +37,7 @@ function loadData(filename: string): any {
 
 // test svg library
 let draw = SVG().addTo('#drawing');//.size(300, 300);
-let rect = draw.rect(100, 100).attr({fill: 'green', stroke: 'blue'});
+let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
 
 // test timelines
 
@@ -48,8 +50,16 @@ const anime = "res/cutOff.json";
 const foo: TimelineData = loadData(sample);
 const bar: TimelineData = loadData(anime);
 
-const tl = new Timeline(foo, "sampleTimeline");
-const t2 = new Timeline(bar, "animeTimeline");
-//console.log( tl.data);
+export const tl = new Timeline(foo, "sampleTimeline");
 tl.build();
+
+export const sample_500 = new Timeline(TL.makeTestPattern1(500), "sampleTimeline");
+export const sample_1000 = new Timeline(TL.makeTestPattern1(1000), "sampleTimeline");
+export const sample_1500 = new Timeline(TL.makeTestPattern1(1500), "sampleTimeline");
+
+sample_500.build();
+sample_1000.build();
+sample_1500.build();
+
+export const t2 = new Timeline(bar, "animeTimeline");
 t2.build();

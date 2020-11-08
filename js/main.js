@@ -5,6 +5,7 @@
  *
  */
 import { Timeline } from "./src/timeline.js";
+import * as TL from "./src/timeline.js";
 import "./jquery.js";
 console.log("motd");
 // read a file the "wrong" way
@@ -34,9 +35,14 @@ const anime = "res/cutOff.json";
 // const anime = "res/test.json";
 const foo = loadData(sample);
 const bar = loadData(anime);
-const tl = new Timeline(foo, "sampleTimeline");
-const t2 = new Timeline(bar, "animeTimeline");
-//console.log( tl.data);
+export const tl = new Timeline(foo, "sampleTimeline");
 tl.build();
+export const sample_500 = new Timeline(TL.makeTestPattern1(500), "sampleTimeline");
+export const sample_1000 = new Timeline(TL.makeTestPattern1(1000), "sampleTimeline");
+export const sample_1500 = new Timeline(TL.makeTestPattern1(1500), "sampleTimeline");
+sample_500.build();
+sample_1000.build();
+sample_1500.build();
+export const t2 = new Timeline(bar, "animeTimeline");
 t2.build();
 //# sourceMappingURL=main.js.map

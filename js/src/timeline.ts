@@ -214,8 +214,14 @@ export class Timeline {
     public readonly startDate: Date;
     public readonly endDate: Date;
 
+    /** 
+     * The very beginning and end of the axis.
+     * date0 -> x = 0
+     * date1 -> x = width
+     */
     public readonly date0: number;
     public readonly date1: number;
+
     public readonly totalSeconds: number;
 
 
@@ -256,8 +262,12 @@ export class Timeline {
         this.startDate = new Date(this.data.startDate);
         this.endDate = new Date(this.data.endDate);
 
-        const delta: number = (this.endDate.valueOf() - this.startDate.valueOf());
-        const padding: number = (new Date(delta * 0.1)).valueOf();
+        const timeWindowSpan: number = (this.endDate.valueOf() - this.startDate.valueOf());
+
+        // Use the same number of pixels regardless of how wide the timeline is
+        const paddingScale = 1000 / this.width;
+        const timeScale = 0.1;
+        const padding: number = (new Date(timeWindowSpan * timeScale * paddingScale)).valueOf();
 
         this.date0 = this.startDate.valueOf() - padding;
         this.date1 = this.endDate.valueOf() + padding;
@@ -267,6 +277,7 @@ export class Timeline {
         this.tickFormat = this.data.tickFormat;
 
         //TODO use a map instead
+        // Also what are these
         this.markers = {};
 
         //
@@ -878,11 +889,32 @@ export class Timeline {
     }
 
 
-
-
 }
 
 
 
+export function makeTestPattern1(width: number): TimelineDataV2 {
+    const testPattern_1: TimelineDataV2 = {
+        apiVersion: 2,
+        width: width,
+        tickFormat: "%Y-%m-%d ",
+        startDate: "2019-01-01",
+        endDate: "2019-01-10",
+        callouts: function () {
+            const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const callouts: TimelineCalloutV2[] = [];
+            for (let i = 0; i < 8; ++i) {
+                callouts.push({
+                    description: alpha[i],
+                    date: `2019-01-${(i + 2).toString().padStart(2, "0")}`
+                });
+            }
+            return callouts;
+        }(),
+
+    };
+    return testPattern_1;
+
+}
 
 

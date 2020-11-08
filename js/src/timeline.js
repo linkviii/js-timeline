@@ -105,6 +105,8 @@ export class Timeline {
     constructor(data, id) {
         this.fontSize = 8;
         this.fontFamily = 'Helvetica';
+        //
+        this.strfutc = strftime.utc();
         if (data.apiVersion == 2) {
             this.data = data;
         }
@@ -117,13 +119,17 @@ export class Timeline {
         this.axisGroup = this.drawing.group();
         this.startDate = new Date(this.data.startDate);
         this.endDate = new Date(this.data.endDate);
-        const delta = (this.endDate.valueOf() - this.startDate.valueOf());
-        const padding = (new Date(delta * 0.1)).valueOf();
+        const timeWindowSpan = (this.endDate.valueOf() - this.startDate.valueOf());
+        // Use the same number of pixels regardless of how wide the timeline is
+        const paddingScale = 1000 / this.width;
+        const timeScale = 0.1;
+        const padding = (new Date(timeWindowSpan * timeScale * paddingScale)).valueOf();
         this.date0 = this.startDate.valueOf() - padding;
         this.date1 = this.endDate.valueOf() + padding;
         this.totalSeconds = (this.date1 - this.date0) / 1000;
         this.tickFormat = this.data.tickFormat;
         //TODO use a map instead
+        // Also what are these
         this.markers = {};
         //
         // Needs to happen after initializing drawing
@@ -182,7 +188,7 @@ export class Timeline {
         const fill = kw.fill || Colors.gray;
         let label;
         if (this.tickFormat) {
-            label = strftime(this.tickFormat, dt);
+            label = this.strfutc(this.tickFormat, dt);
         }
         else {
             label = dt.toDateString();
@@ -575,4 +581,25 @@ export class Timeline {
 }
 // x,y of adjustment of callout text
 Timeline.textFudge = 3;
+export function makeTestPattern1(width) {
+    const testPattern_1 = {
+        apiVersion: 2,
+        width: width,
+        tickFormat: "%Y-%m-%d ",
+        startDate: "2019-01-01",
+        endDate: "2019-01-10",
+        callouts: function () {
+            const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const callouts = [];
+            for (let i = 0; i < 8; ++i) {
+                callouts.push({
+                    description: alpha[i],
+                    date: `2019-01-${(i + 2).toString().padStart(2, "0")}`
+                });
+            }
+            return callouts;
+        }(),
+    };
+    return testPattern_1;
+}
 //# sourceMappingURL=timeline.js.map
