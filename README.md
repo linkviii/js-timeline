@@ -17,6 +17,8 @@ type TimelineCalloutV1 = [string, string]|[string, string, string];
 type TimelineEraV1 = [string, string, string]|[string, string, string, string];
 interface TimelineDataV1 {
     width: number;
+    fontSize?: number;
+    fontFamily?: string;
     start: string;
     end: string;
     num_ticks?: number;
