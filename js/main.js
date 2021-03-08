@@ -6,6 +6,7 @@
  */
 import { Timeline } from "./src/timeline.js";
 import * as TL from "./src/timeline.js";
+export const tllib = TL;
 import "./jquery.js";
 console.log("motd");
 // read a file the "wrong" way
@@ -28,7 +29,8 @@ function loadData(filename) {
 let draw = SVG().addTo('#drawing'); //.size(300, 300);
 let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
 // test timelines
-const sample = "res/simple_timeline.json";
+// const sample = "res/simple_timeline.json";
+const sample = "res/biftest.json";
 // const sample = "res/no_callout.json";
 // const anime = "res/animev2.json";
 const anime = "res/cutOff.json";
@@ -37,6 +39,7 @@ const foo = loadData(sample);
 const bar = loadData(anime);
 export const tl = new Timeline(foo, "sampleTimeline");
 tl.build();
+// throw 1;
 export const sample_500 = new Timeline(TL.makeTestPattern1(500), "sampleTimeline");
 export const sample_1000 = new Timeline(TL.makeTestPattern1(1000), "sampleTimeline");
 export const sample_1500 = new Timeline(TL.makeTestPattern1(1500), "sampleTimeline");

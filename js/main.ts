@@ -9,6 +9,7 @@
 import { Timeline, TimelineData } from "./src/timeline.js";
 
 import * as TL from "./src/timeline.js";
+export const tllib = TL;
 
 
 import "./jquery.js";
@@ -41,7 +42,8 @@ let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
 
 // test timelines
 
-const sample = "res/simple_timeline.json";
+// const sample = "res/simple_timeline.json";
+const sample = "res/biftest.json";
 // const sample = "res/no_callout.json";
 // const anime = "res/animev2.json";
 const anime = "res/cutOff.json";
@@ -52,6 +54,7 @@ const bar: TimelineData = loadData(anime);
 
 export const tl = new Timeline(foo, "sampleTimeline");
 tl.build();
+// throw 1;
 
 export const sample_500 = new Timeline(TL.makeTestPattern1(500), "sampleTimeline");
 export const sample_1000 = new Timeline(TL.makeTestPattern1(1000), "sampleTimeline");

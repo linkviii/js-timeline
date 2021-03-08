@@ -48,9 +48,11 @@ interface TimelineEraV2 {
     color?: string;
 }
 
-interface TimelineDataV2 {
-    apiVersion: 2; 
+export interface TimelineDataV2 {
+    apiVersion: 2;
     width: number;
+    fontSize?: number;
+    fontFamily?: string;
     startDate: string;
     endDate: string;
     numTicks?: number;

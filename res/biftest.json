@@ -1,0 +1,50 @@
+{
+    "apiVersion": 2,
+    "width": 1000,
+    "fontSize": 12,
+    "tickFormat": "%Y-%m-%d ",
+    "startDate": "2019-01-01",
+    "endDate": "2019-01-10",
+    "callouts": [
+        {
+            "description": "A0",
+            "date": "2019-01-02"
+        },
+        {
+            "description": "what in the world why is this event name so long? Come on man!",
+            "date": "2019-01-02"
+        },
+        {
+            "description": "B",
+            "date": "2019-01-03"
+        },
+        {
+            "description": "world world",
+            "date": "2019-01-03"
+        },
+        {
+            "description": "C",
+            "date": "2019-01-04"
+        },
+        {
+            "description": "D",
+            "date": "2019-01-05"
+        },
+        {
+            "description": "E",
+            "date": "2019-01-06"
+        },
+        {
+            "description": "F",
+            "date": "2019-01-07"
+        },
+        {
+            "description": "G",
+            "date": "2019-01-08"
+        },
+        {
+            "description": "H",
+            "date": "2019-01-09"
+        }
+    ]
+}
