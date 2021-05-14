@@ -14,6 +14,11 @@ export const tllib = TL;
 
 import "./jquery.js";
 
+import "./lib/FileSaver.js";
+
+declare function saveAs(foo?, fooo?);
+
+
 declare function SVG();
 
 console.log("motd")
@@ -33,6 +38,48 @@ function loadData(filename: string): any {
         });
         return json;
     })();
+
+}
+
+export function saveSVG(elm: SVGElement) {
+    const filename = "some.svg";
+    const svgdata = new XMLSerializer().serializeToString(elm);
+
+    const blob = new Blob([svgdata], { type: "image/svg+xml" });
+    saveAs(blob, filename);
+}
+
+export function savePNG(elm: SVGElement) {
+    const filename = "some.png";
+    const svgdata = new XMLSerializer().serializeToString(elm);
+
+    {
+        // See https://github.com/Linkviii/js-animelist-timeline/issues/3
+        const img = document.createElement("img");
+        img.setAttribute("src", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgdata))));
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const svgSize = elm.getBoundingClientRect();
+
+        // With 8pt font, at 1x scale the text is blurry 
+        const scale = 2;
+        canvas.width = svgSize.width * scale;
+        canvas.height = svgSize.height * scale;
+
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(function (blob) {
+                saveAs(blob, filename);
+            });
+        };
+
+    }
 
 }
 
