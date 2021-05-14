@@ -77,8 +77,8 @@ const logoData = {
     // Don't show dates
     tickFormat: " ",
     callouts: [
-        { description: "Javascript", date: dates[0], color: startColor1 },
-        { description: "SVG", date: dates[1], color: bingeColor },
+        { description: "Javascript", date: dates[0], color: startColor1, backgroundColor: "black" },
+        { description: "SVG", date: dates[1], color: bingeColor, backgroundColor: "transparent" },
         { description: "Timeline", date: dates[2], color: endColor },
     ],
     startDate: dates[0],
