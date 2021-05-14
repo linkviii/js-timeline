@@ -14,8 +14,7 @@ export const tllib = TL;
 
 import "./jquery.js";
 
-import "./lib/FileSaver.js";
-
+// import "./lib/FileSaver.js";
 declare function saveAs(foo?, fooo?);
 
 
@@ -49,7 +48,7 @@ export function saveSVG(elm: SVGElement) {
     saveAs(blob, filename);
 }
 
-export function savePNG(elm: SVGElement) {
+export function savePNG(elm: SVGElement, transparent = false) {
     const filename = "some.png";
     const svgdata = new XMLSerializer().serializeToString(elm);
 
@@ -68,8 +67,10 @@ export function savePNG(elm: SVGElement) {
         canvas.width = svgSize.width * scale;
         canvas.height = svgSize.height * scale;
 
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (transparent) {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
         img.onload = function () {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -83,9 +84,40 @@ export function savePNG(elm: SVGElement) {
 
 }
 
+
+
 // test svg library
 let draw = SVG().addTo('#drawing');//.size(300, 300);
 let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
+
+//
+//
+const startColor1: string = "#C0C0FF";//blueish
+const endColor: string = "#CD3F85";
+const bingeColor = "#000000";  // just black
+const dates = [
+    "2020-01-01",
+    "2020-01-04",
+    "2020-01-09",
+];
+const logoData: TL.TimelineDataV2 = {
+    apiVersion: 2,
+    width: 300,
+    fontSize: 15,
+    // Don't show dates
+    tickFormat: " ",
+    callouts: [
+        { description: "Javascript", date: dates[0], color: startColor1 },
+        { description: "SVG", date: dates[1], color: bingeColor },
+        { description: "Timeline", date: dates[2], color: endColor },
+
+    ],
+
+    startDate: dates[0],
+    endDate: dates[2],
+};
+const logoTimeline = new Timeline(logoData, "logo");
+logoTimeline.build();
 
 // test timelines
 
