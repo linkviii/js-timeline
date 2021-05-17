@@ -1,4 +1,7 @@
 # js-timeline
+
+![image](res/badlogo.svg)
+
 Generate svg timelines with javascript. Demo: http://linkviii.github.io/js-timeline/
 
 From json describing a list of dates, build a graphical timeline representation. 
@@ -89,7 +92,6 @@ git clone https://github.com/Linkviii/js-timeline.git
 tsc
 ```
 
-I use Webstorm which automatically compiles. It has compiled things that `tsc` would error on. If I was lazy, code pushed might not "compile".
 
 ## Dependencies 
 * jquery - MIT license

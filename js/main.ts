@@ -67,7 +67,7 @@ export function savePNG(elm: SVGElement, transparent = false) {
         canvas.width = svgSize.width * scale;
         canvas.height = svgSize.height * scale;
 
-        if (transparent) {
+        if (!transparent) {
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -93,6 +93,7 @@ let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
 //
 //
 const startColor1: string = "#C0C0FF";//blueish
+const startColor2: string = "#0026FF";
 const endColor: string = "#CD3F85";
 const bingeColor = "#000000";  // just black
 const dates = [
@@ -107,10 +108,14 @@ const logoData: TL.TimelineDataV2 = {
     // Don't show dates
     tickFormat: " ",
     callouts: [
-        { description: "Javascript", date: dates[0], color: startColor1, backgroundColor: "black" },
+        { description: "Javascript", date: dates[0], color: startColor2, backgroundColor: startColor1 },
+        { description: "Typescript", date: dates[0], color: startColor1, backgroundColor: "black" },
         { description: "SVG", date: dates[1], color: bingeColor, backgroundColor: "transparent" },
         { description: "Timeline", date: dates[2], color: endColor },
 
+    ],
+    eras: [
+        {startDate: dates[0], endDate: dates[dates.length-1], name: "For All Time"}
     ],
 
     startDate: dates[0],
