@@ -15,12 +15,12 @@ export const tllib = TL;
 import "./jquery.js";
 
 // import "./lib/FileSaver.js";
-declare function saveAs(foo?, fooo?);
+declare function saveAs(foo?: any, fooo?: any): any;
 
 
-declare function SVG();
+declare function SVG(): any;
 
-console.log("motd")
+console.log("motd");
 
 // read a file the "wrong" way
 function loadData(filename: string): any {
@@ -59,6 +59,9 @@ export function savePNG(elm: SVGElement, transparent = false) {
 
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
+        if (null === ctx) {
+            throw new Error("Imposable? null canvas ctx");
+        }
 
         const svgSize = elm.getBoundingClientRect();
 
@@ -115,7 +118,7 @@ const logoData: TL.TimelineDataV2 = {
 
     ],
     eras: [
-        {startDate: dates[0], endDate: dates[dates.length-1], name: "For All Time"}
+        { startDate: dates[0], endDate: dates[dates.length - 1], name: "For All Time" }
     ],
 
     startDate: dates[0],

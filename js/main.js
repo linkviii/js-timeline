@@ -40,6 +40,9 @@ export function savePNG(elm, transparent = false) {
         img.setAttribute("src", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgdata))));
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
+        if (null === ctx) {
+            throw new Error("Imposable? null canvas ctx");
+        }
         const svgSize = elm.getBoundingClientRect();
         // With 8pt font, at 1x scale the text is blurry 
         const scale = 2;

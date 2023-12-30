@@ -84,10 +84,10 @@ export class TimelineConverter {
             newData.tickFormat = oldData.tick_format;
         }
         // Convert tuples to objects
-        if ('callouts' in oldData) {
+        if (oldData.callouts) {
             newData.callouts = TimelineConverter.convertCallouts(oldData.callouts);
         }
-        if ('eras' in oldData) {
+        if (oldData.eras) {
             newData.eras = TimelineConverter.convertEras(oldData.eras);
         }
         return newData;
@@ -100,13 +100,37 @@ export class TimelineConverter {
 class OoBDate extends Error {
 }
 export class Timeline {
+    fontSize;
+    fontFamily;
+    fontHeight;
+    calloutProperties;
+    // x,y of adjustment of callout text
+    static textFudge = 3;
+    data;
+    startDate;
+    endDate;
+    /**
+     * The very beginning and end of the axis.
+     * date0 -> x = 0
+     * date1 -> x = width
+     */
+    date0;
+    date1;
+    totalSeconds;
+    tickFormat;
+    markers;
+    maxLabelHeight;
+    width;
+    /** Width that is "dead" to accommodate long text on the far left */
+    deadWidth;
+    extraWidth;
+    drawing;
+    axisGroup;
+    //
+    strfutc = strftime.utc();
     // initializes data for timeline
     // Call `build` to generate svg
     constructor(data, id) {
-        //
-        this.strfutc = strftime.utc();
-        this.debugMap = [];
-        this.canvas = document.createElement("canvas");
         if (data.apiVersion == 2) {
             this.data = data;
         }
@@ -238,7 +262,8 @@ export class Timeline {
     // Callout generating functions
     ///
     sortCallouts() {
-        this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
+        if (this.data.callouts)
+            this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
     }
     static sortCallouts(callouts) {
         callouts.sort((a, b) => compareDateStr(a.date, b.date));
@@ -327,6 +352,7 @@ export class Timeline {
         prevLevels.push(level);
         return [calloutHeight, event];
     }
+    debugMap = [];
     putInDebugMap(str, level, point) {
         while (level >= this.debugMap.length) {
             this.debugMap.push({});
@@ -441,7 +467,7 @@ export class Timeline {
      * @returns {number} min_y
      */
     createCallouts() {
-        if (!('callouts' in this.data)) {
+        if (!(this.data.callouts)) {
             return 0;
         }
         this.sortCallouts();
@@ -512,7 +538,7 @@ export class Timeline {
     createDateTicks() {
         this.addAxisLabel(this.startDate, { tick: true });
         this.addAxisLabel(this.endDate, { tick: true });
-        if ('numTicks' in this.data) {
+        if (this.data.numTicks !== undefined) {
             const timeRange = this.endDate.valueOf() - this.startDate.valueOf();
             const numTicks = this.data.numTicks;
             for (let j = 1; j < numTicks; j++) {
@@ -544,16 +570,16 @@ export class Timeline {
         return [startMarker, endMarker];
     }
     ;
-    giveTxtBackground(txt, fill) {
-        const bbox = txt.bbox();
+    giveTxtBackground(txtObj, fill) {
+        const bbox = txtObj.bbox();
         let rect = new SVG.Rect({ width: bbox.width, height: bbox.height }).fill(fill);
-        txt.before(rect);
-        rect.move(txt.x(), txt.y());
+        txtObj.before(rect);
+        rect.move(txtObj.x(), txtObj.y());
         rect.radius(2);
         return rect;
     }
     createEras(yEra, yAxis, height) {
-        if (!('eras' in this.data)) {
+        if (!(this.data.eras)) {
             return;
         }
         //# create eras
@@ -631,6 +657,7 @@ export class Timeline {
         // The box seems fuzzy so lets give a small amount of padding.
         return Math.ceil(box.width) + 1;
     }
+    canvas = document.createElement("canvas");
     getTextDim(text) {
         /*
          * Using SVG.Text's bbox was a performance bottleneck.
@@ -639,6 +666,8 @@ export class Timeline {
          */
         const canvas = this.canvas;
         const context = canvas.getContext("2d");
+        if (context === null)
+            throw new Error("null canvas context");
         context.font = `${this.fontSize}pt ${this.fontFamily}`;
         const metrics = context.measureText(text);
         return metrics;
@@ -646,11 +675,9 @@ export class Timeline {
     ;
     getTextWidth2(text) {
         const metrics = this.getTextDim(text);
-        return Math.ceil(metrics.width);
+        return Math.ceil(metrics.width) + 1;
     }
 }
-// x,y of adjustment of callout text
-Timeline.textFudge = 3;
 // Test linear spacing of callouts
 export function makeTestPattern1(width) {
     const testPattern_1 = {

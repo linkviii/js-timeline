@@ -16,7 +16,7 @@
 // import * as SVG from "../lib/svgjs.js";
 
 // declare function SVG();
-declare var SVG;
+declare var SVG: any;
 
 
 // declare function strftime(format: string, date: Date);
@@ -48,7 +48,7 @@ function compareDateStr(a: string, b: string): number {
 }
 
 
-function intersect<T>(start: T, end: T, other: T, evaler?: (T) => any): boolean {
+function intersect<T>(start: T, end: T, other: T, evaler?: (_: T) => any): boolean {
     evaler = evaler || (x => x);
     const otherVal = evaler(other);
     return evaler(start) <= otherVal && otherVal <= evaler(end);
@@ -58,7 +58,7 @@ function intersect<T>(start: T, end: T, other: T, evaler?: (T) => any): boolean 
 //
 //
 
-export const Colors: { black: string, gray: string } = { black: '#000000', gray: '#C0C0C0' };
+export const Colors: { black: string, gray: string; } = { black: '#000000', gray: '#C0C0C0' };
 
 //
 
@@ -130,7 +130,7 @@ export class TimelineConverter {
                 date: oldCallout[1]
             };
             if (oldCallout.length == 3) {
-                newCallout.color = oldCallout[2]
+                newCallout.color = oldCallout[2];
             }
             callouts.push(newCallout);
         }
@@ -171,10 +171,10 @@ export class TimelineConverter {
         }
 
         // Convert tuples to objects
-        if ('callouts' in oldData) {
+        if (oldData.callouts) {
             newData.callouts = TimelineConverter.convertCallouts(oldData.callouts);
         }
-        if ('eras' in oldData) {
+        if (oldData.eras) {
             newData.eras = TimelineConverter.convertEras(oldData.eras);
         }
 
@@ -211,7 +211,7 @@ export class Timeline {
     public readonly fontFamily;
     readonly fontHeight: number;
 
-    public readonly calloutProperties: { width: number, height: number, increment: number };
+    public readonly calloutProperties: { width: number, height: number, increment: number; };
     // x,y of adjustment of callout text
     public static readonly textFudge: number = 3;
 
@@ -234,8 +234,8 @@ export class Timeline {
     public readonly totalSeconds: number;
 
 
-    public readonly tickFormat: string;
-    public readonly markers;
+    public readonly tickFormat?: string;
+    public readonly markers: Record<string, any>;
 
     public maxLabelHeight: number;
 
@@ -437,7 +437,8 @@ export class Timeline {
 
 
     private sortCallouts(): void {
-        this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
+        if (this.data.callouts)
+            this.data.callouts.sort((a, b) => compareDateStr(a.date, b.date));
     }
 
     static sortCallouts(callouts: TimelineCalloutV2[]): void {
@@ -559,16 +560,16 @@ export class Timeline {
         return [calloutHeight, event];
     }
 
-    private debugMap = [];
+    private debugMap: Record<number, string>[] = [];
 
-    private putInDebugMap(str, level, point) {
+    private putInDebugMap(str: string, level: number, point: number) {
         while (level >= this.debugMap.length) {
             this.debugMap.push({});
         }
 
         if (this.debugMap[level][point]) {
-            console.error("Overwrote ", level, ",", point)
-            console.log("Was: ", this.debugMap[level][point])
+            console.error("Overwrote ", level, ",", point);
+            console.log("Was: ", this.debugMap[level][point]);
             console.log("Now: ", str);
         }
 
@@ -666,19 +667,19 @@ export class Timeline {
                 endpointMap.push([]);
             }
             endpointMap[bifLevel - 1].push(eventEndpoint);
-            this.putInDebugMap(bif[0], bifLevel, eventEndpoint);
+            this.putInDebugMap(bif![0], bifLevel, eventEndpoint);
 
             if (bifLevel != 1) {
                 endpointMap[bifLevel - 2].push(eventEndpoint);
-                this.putInDebugMap(bif[1], bifLevel - 1, eventEndpoint);
+                this.putInDebugMap(bif![1], bifLevel - 1, eventEndpoint);
 
             }
 
             const calloutHeight = bifLevel * this.calloutProperties.increment;
-            event = bif.join("\n");
+            event = bif!.join("\n");
 
 
-            return [bifLeftBoundary, calloutHeight, event];
+            return [bifLeftBoundary!, calloutHeight, event];
         } else {
 
             while (level >= endpointMap.length) {
@@ -699,7 +700,7 @@ export class Timeline {
      * @returns {number} min_y
      */
     private createCallouts(): number {
-        if (!('callouts' in this.data)) {
+        if (!(this.data.callouts)) {
             return 0;
         }
 
@@ -798,7 +799,7 @@ export class Timeline {
         this.addAxisLabel(this.startDate, { tick: true });
         this.addAxisLabel(this.endDate, { tick: true });
 
-        if ('numTicks' in this.data) {
+        if (this.data.numTicks !== undefined) {
             const timeRange = this.endDate.valueOf() - this.startDate.valueOf();
 
             const numTicks = this.data.numTicks;
@@ -824,27 +825,27 @@ export class Timeline {
         if (color in this.markers) {
             [startMarker, endMarker] = this.markers[color];
         } else {
-            startMarker = this.drawing.marker(10, 10, function (add) {
-                add.path("M6,0 L6,7 L0,3 L6,0").fill(color)
+            startMarker = this.drawing.marker(10, 10, function (add: any) {
+                add.path("M6,0 L6,7 L0,3 L6,0").fill(color);
             }).ref(0, 3);
 
-            endMarker = this.drawing.marker(10, 10, function (add) {
-                add.path("M0,0 L0,7 L6,3 L0,0").fill(color)
+            endMarker = this.drawing.marker(10, 10, function (add: any) {
+                add.path("M0,0 L0,7 L6,3 L0,0").fill(color);
             }).ref(6, 3);
 
-            this.markers[color] = [startMarker, endMarker]
+            this.markers[color] = [startMarker, endMarker];
         }
 
-        return [startMarker, endMarker]
+        return [startMarker, endMarker];
     };
 
 
-    giveTxtBackground(txt, fill): any {
-        const bbox = txt.bbox();
+    giveTxtBackground(txtObj:any, fill:any): any {
+        const bbox = txtObj.bbox();
 
         let rect = new SVG.Rect({ width: bbox.width, height: bbox.height }).fill(fill);
-        txt.before(rect);
-        rect.move(txt.x(), txt.y());
+        txtObj.before(rect);
+        rect.move(txtObj.x(), txtObj.y());
 
         rect.radius(2);
         return rect;
@@ -853,7 +854,7 @@ export class Timeline {
 
 
     private createEras(yEra: number, yAxis: number, height: number): void {
-        if (!('eras' in this.data)) {
+        if (!(this.data.eras)) {
             return;
         }
 
@@ -978,6 +979,7 @@ export class Timeline {
 
         const canvas = this.canvas;
         const context = canvas.getContext("2d");
+        if (context === null) throw new Error("null canvas context");
         context.font = `${this.fontSize}pt ${this.fontFamily}`;
         const metrics = context.measureText(text);
         return metrics;
@@ -986,7 +988,7 @@ export class Timeline {
     getTextWidth2(text: string): number {
 
         const metrics = this.getTextDim(text);
-        return Math.ceil(metrics.width);
+        return Math.ceil(metrics.width) + 1;
 
 
     }
