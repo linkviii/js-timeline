@@ -42,7 +42,7 @@ export const Colors = { black: '#000000', gray: '#C0C0C0' };
 export class TimelineConverter {
     static convertCallouts(oldCallouts) {
         const callouts = [];
-        for (let oldCallout of oldCallouts) {
+        for (const oldCallout of oldCallouts) {
             const newCallout = {
                 description: oldCallout[0],
                 date: oldCallout[1]
@@ -56,7 +56,7 @@ export class TimelineConverter {
     }
     static convertEras(oldEras) {
         const eras = [];
-        for (let oldEra of oldEras) {
+        for (const oldEra of oldEras) {
             const newEra = {
                 name: oldEra[0],
                 startDate: oldEra[1],
@@ -189,7 +189,7 @@ export class Timeline {
         // Calculate how far oob callout text can go
         // leftBoundary < 0 → oob
         // let minX: number = Infinity;
-        for (let callout of this.data.callouts) {
+        for (const callout of this.data.callouts) {
             const calloutDate = new Date(callout.date);
             const x = this.dateToX(calloutDate);
             if (x instanceof OoBDate) {
@@ -270,7 +270,7 @@ export class Timeline {
     }
     eraOfDate(date) {
         if (this.data.eras) {
-            for (let era of this.data.eras) {
+            for (const era of this.data.eras) {
                 if (intersect(new Date(era.startDate), new Date(era.endDate), date, x => x.valueOf())) {
                     return era;
                 }
@@ -434,7 +434,7 @@ export class Timeline {
         // Select level
         //
         const maxEventWidth = 50; // char... Dangerous with unicode?
-        let useBifurcated = bifLevel != 0 && (bifLevel <= level
+        const useBifurcated = bifLevel != 0 && (bifLevel <= level
             || event.length > maxEventWidth);
         // 
         if (useBifurcated) {
@@ -472,15 +472,15 @@ export class Timeline {
         }
         this.sortCallouts();
         //# add callouts, one by one, making sure they don't overlap
-        let prevX = [-Infinity];
-        let prevLevel = [-1];
-        let endpointMap = [[]];
+        const prevX = [-Infinity];
+        const prevLevel = [-1];
+        const endpointMap = [[]];
         //vertical drawing up is negative ~= max height
         let minY = Infinity;
         let minX = Infinity;
         // Last place we drew an axis label
         let lastLabelX = 0;
-        for (let callout of this.data.callouts) {
+        for (const callout of this.data.callouts) {
             const eventColor = callout.color || Colors.black;
             const calloutDate = new Date(callout.date);
             const x = this.dateToX(calloutDate);
@@ -493,7 +493,7 @@ export class Timeline {
             if (bgEra) {
                 eraColor = bgEra.color || Colors.gray;
             }
-            let bgColor = callout.backgroundColor || eraColor || "white";
+            const bgColor = callout.backgroundColor || eraColor || "white";
             // const bgFill = { color: bgColor, opacity: 0.15 };
             const bgFill = { color: bgColor, opacity: 1 };
             //# figure out what 'level" to make the callout on
@@ -572,7 +572,7 @@ export class Timeline {
     ;
     giveTxtBackground(txtObj, fill) {
         const bbox = txtObj.bbox();
-        let rect = new SVG.Rect({ width: bbox.width, height: bbox.height }).fill(fill);
+        const rect = new SVG.Rect({ width: bbox.width, height: bbox.height }).fill(fill);
         txtObj.before(rect);
         rect.move(txtObj.x(), txtObj.y());
         rect.radius(2);
@@ -583,7 +583,7 @@ export class Timeline {
             return;
         }
         //# create eras
-        for (let era of this.data.eras) {
+        for (const era of this.data.eras) {
             //# extract era data
             const name = era.name;
             const fill = era.color || Colors.gray;
@@ -592,8 +592,8 @@ export class Timeline {
             //# create boundary lines
             //if date isn't in bounds, something interesting will happen
             //But that shouldn't be possible?
-            let t0 = new Date(era.startDate);
-            let t1 = new Date(era.endDate);
+            const t0 = new Date(era.startDate);
+            const t1 = new Date(era.endDate);
             const x0 = this.dateToX(t0) + this.extraWidth;
             const x1 = this.dateToX(t1) + this.extraWidth;
             // Shaded area

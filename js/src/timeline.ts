@@ -16,11 +16,11 @@
 // import * as SVG from "../lib/svgjs.js";
 
 // declare function SVG();
-declare var SVG: any;
+declare var SVG: any; // eslint-disable-line
 
 
 // declare function strftime(format: string, date: Date);
-declare namespace strftime {
+declare namespace strftime { // eslint-disable-line
     function utc(): (format: string, date: Date) => string;
 }
 
@@ -124,12 +124,12 @@ export class TimelineConverter {
     public static convertCallouts(oldCallouts: TimelineCalloutV1[]): TimelineCalloutV2[] {
         const callouts: TimelineCalloutV2[] = [];
 
-        for (let oldCallout of oldCallouts) {
+        for (const oldCallout of oldCallouts) {
             const newCallout: TimelineCalloutV2 = {
                 description: oldCallout[0],
                 date: oldCallout[1]
             };
-            if (oldCallout.length == 3) {
+            if (oldCallout.length === 3) {
                 newCallout.color = oldCallout[2];
             }
             callouts.push(newCallout);
@@ -139,13 +139,13 @@ export class TimelineConverter {
 
     public static convertEras(oldEras: TimelineEraV1[]): TimelineEraV2[] {
         const eras: TimelineEraV2[] = [];
-        for (let oldEra of oldEras) {
+        for (const oldEra of oldEras) {
             const newEra: TimelineEraV2 = {
                 name: oldEra[0],
                 startDate: oldEra[1],
                 endDate: oldEra[2]
             };
-            if (oldEra.length == 4) {
+            if (oldEra.length === 4) {
                 newEra.color = oldEra[3];
             }
             eras.push(newEra);
@@ -254,7 +254,7 @@ export class Timeline {
     // Call `build` to generate svg
     constructor(data: TimelineData, id: string) {
 
-        if ((<TimelineDataV2>data).apiVersion == 2) {
+        if ((<TimelineDataV2>data).apiVersion === 2) {
             this.data = <TimelineDataV2>data;
         } else {
             this.data = TimelineConverter.convertTimelineDataV1ToV2(<TimelineDataV1>data);
@@ -335,7 +335,7 @@ export class Timeline {
         // Calculate how far oob callout text can go
         // leftBoundary < 0 → oob
         // let minX: number = Infinity;
-        for (let callout of this.data.callouts) {
+        for (const callout of this.data.callouts) {
             const calloutDate: Date = new Date(callout.date);
             const x: number | OoBDate = this.dateToX(calloutDate);
             if (x instanceof OoBDate) {
@@ -447,7 +447,7 @@ export class Timeline {
 
     eraOfDate(date: Date): TimelineEraV2 | null {
         if (this.data.eras) {
-            for (let era of this.data.eras) {
+            for (const era of this.data.eras) {
                 if (intersect(new Date(era.startDate), new Date(era.endDate), date, x => x.valueOf())) {
                     return era;
                 }
@@ -471,7 +471,7 @@ export class Timeline {
         let splitValue: number = Infinity;
 
         for (let i = cuttingRangeStart; i < cuttingRangeEnd; i++) {
-            if (str[i] == " ") {
+            if (str[i] === " ") {
 
                 const v = Math.abs(i - half);
                 if (v < splitValue) {
@@ -482,7 +482,7 @@ export class Timeline {
         }
 
 
-        if (bestSplitPoint != 0) {
+        if (bestSplitPoint !== 0) {
             return [str.slice(0, bestSplitPoint), str.slice(bestSplitPoint + 1, str.length)];
         } else {
             return null;
@@ -593,7 +593,7 @@ export class Timeline {
         // Good if the left boundary of this event does not intersect the nearest event to the left
         const isGood = function (row?: number[]) {
             if (row) {
-                if (row.length == 0 || row[row.length - 1] < leftBoundary) {
+                if (row.length === 0 || row[row.length - 1] < leftBoundary) {
                     return true;
                 } else {
                     return false;
@@ -612,7 +612,7 @@ export class Timeline {
             }
         }
         // If space couldn't be found on an existing level, make a new level for it
-        if (level == 0) {
+        if (level === 0) {
             level = endpointMap.length;
         }
 
@@ -629,7 +629,7 @@ export class Timeline {
 
             const isGood = function (row?: number[]) {
                 if (row) {
-                    if (row.length == 0 || row[row.length - 1] < bifLeftBoundary) {
+                    if (row.length === 0 || row[row.length - 1] < bifLeftBoundary) {
                         return true;
                     } else {
                         return false;
@@ -646,7 +646,7 @@ export class Timeline {
                     break;
                 }
             }
-            if (bifLevel == 0) {
+            if (bifLevel === 0) {
                 bifLevel = endpointMap.length + 1;
             }
         }
@@ -655,7 +655,7 @@ export class Timeline {
         //
 
         const maxEventWidth = 50; // char... Dangerous with unicode?
-        let useBifurcated = bifLevel != 0 && (
+        const useBifurcated = bifLevel !== 0 && (
             bifLevel <= level
             || event.length > maxEventWidth
         );
@@ -669,7 +669,7 @@ export class Timeline {
             endpointMap[bifLevel - 1].push(eventEndpoint);
             this.putInDebugMap(bif![0], bifLevel, eventEndpoint);
 
-            if (bifLevel != 1) {
+            if (bifLevel !== 1) {
                 endpointMap[bifLevel - 2].push(eventEndpoint);
                 this.putInDebugMap(bif![1], bifLevel - 1, eventEndpoint);
 
@@ -707,10 +707,10 @@ export class Timeline {
         this.sortCallouts();
 
         //# add callouts, one by one, making sure they don't overlap
-        let prevX: number[] = [-Infinity];
-        let prevLevel: number[] = [-1];
+        const prevX: number[] = [-Infinity];
+        const prevLevel: number[] = [-1];
 
-        let endpointMap = [[]];
+        const endpointMap = [[]];
 
         //vertical drawing up is negative ~= max height
         let minY = Infinity;
@@ -719,7 +719,7 @@ export class Timeline {
         // Last place we drew an axis label
         let lastLabelX = 0;
 
-        for (let callout of this.data.callouts) {
+        for (const callout of this.data.callouts) {
 
             const eventColor: string = callout.color || Colors.black;
 
@@ -736,7 +736,7 @@ export class Timeline {
             if (bgEra) {
                 eraColor = bgEra.color || Colors.gray;
             }
-            let bgColor = callout.backgroundColor || eraColor || "white";
+            const bgColor = callout.backgroundColor || eraColor || "white";
             // const bgFill = { color: bgColor, opacity: 0.15 };
             const bgFill = { color: bgColor, opacity: 1 };
 
@@ -843,7 +843,7 @@ export class Timeline {
     giveTxtBackground(txtObj:any, fill:any): any {
         const bbox = txtObj.bbox();
 
-        let rect = new SVG.Rect({ width: bbox.width, height: bbox.height }).fill(fill);
+        const rect = new SVG.Rect({ width: bbox.width, height: bbox.height }).fill(fill);
         txtObj.before(rect);
         rect.move(txtObj.x(), txtObj.y());
 
@@ -859,7 +859,7 @@ export class Timeline {
         }
 
         //# create eras
-        for (let era of this.data.eras) {
+        for (const era of this.data.eras) {
             //# extract era data
 
             const name: string = era.name;
@@ -872,8 +872,8 @@ export class Timeline {
             //# create boundary lines
             //if date isn't in bounds, something interesting will happen
             //But that shouldn't be possible?
-            let t0 = new Date(era.startDate);
-            let t1 = new Date(era.endDate);
+            const t0 = new Date(era.startDate);
+            const t1 = new Date(era.endDate);
             const x0: number = <number>this.dateToX(t0) + this.extraWidth;
             const x1: number = <number>this.dateToX(t1) + this.extraWidth;
 

@@ -90,8 +90,8 @@ export function savePNG(elm: SVGElement, transparent = false) {
 
 
 // test svg library
-let draw = SVG().addTo('#drawing');//.size(300, 300);
-let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
+const draw = SVG().addTo('#drawing');//.size(300, 300);
+const rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
 
 //
 //
