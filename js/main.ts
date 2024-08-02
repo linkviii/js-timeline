@@ -139,6 +139,9 @@ const anime = "res/cutOff.json";
 const foo: TimelineData = loadData(sample);
 const bar: TimelineData = loadData(anime);
 
+export const test_tie = new Timeline(TL.makeTestPattern_tie(), "sampleTimeline");
+test_tie.build();
+
 export const tl = new Timeline(foo, "sampleTimeline");
 tl.build();
 // throw 1;

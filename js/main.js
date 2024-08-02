@@ -61,8 +61,8 @@ export function savePNG(elm, transparent = false) {
     }
 }
 // test svg library
-let draw = SVG().addTo('#drawing'); //.size(300, 300);
-let rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
+const draw = SVG().addTo('#drawing'); //.size(300, 300);
+const rect = draw.rect(100, 100).attr({ fill: 'green', stroke: 'blue' });
 //
 //
 const startColor1 = "#C0C0FF"; //blueish
@@ -103,6 +103,8 @@ const anime = "res/cutOff.json";
 // const anime = "res/test.json";
 const foo = loadData(sample);
 const bar = loadData(anime);
+export const test_tie = new Timeline(TL.makeTestPattern_tie(), "sampleTimeline");
+test_tie.build();
 export const tl = new Timeline(foo, "sampleTimeline");
 tl.build();
 // throw 1;

@@ -5,7 +5,7 @@
  *
  * See README.md
  *
- * v 2021-05-14
+ * v 2024-08-01
  *   (Try to change with new features. Not strict.)
  *
  * MIT licensed
@@ -47,7 +47,7 @@ export class TimelineConverter {
                 description: oldCallout[0],
                 date: oldCallout[1]
             };
-            if (oldCallout.length == 3) {
+            if (oldCallout.length === 3) {
                 newCallout.color = oldCallout[2];
             }
             callouts.push(newCallout);
@@ -62,7 +62,7 @@ export class TimelineConverter {
                 startDate: oldEra[1],
                 endDate: oldEra[2]
             };
-            if (oldEra.length == 4) {
+            if (oldEra.length === 4) {
                 newEra.color = oldEra[3];
             }
             eras.push(newEra);
@@ -99,6 +99,14 @@ export class TimelineConverter {
  */
 class OoBDate extends Error {
 }
+function newCalloutLayout() {
+    return {
+        endpointMap: [[]],
+        idMap: {},
+        lockedLevelMap: {},
+        ties: new Set(),
+    };
+}
 export class Timeline {
     fontSize;
     fontFamily;
@@ -131,7 +139,7 @@ export class Timeline {
     // initializes data for timeline
     // Call `build` to generate svg
     constructor(data, id) {
-        if (data.apiVersion == 2) {
+        if (data.apiVersion === 2) {
             this.data = data;
         }
         else {
@@ -290,7 +298,7 @@ export class Timeline {
         let bestSplitPoint = 0;
         let splitValue = Infinity;
         for (let i = cuttingRangeStart; i < cuttingRangeEnd; i++) {
-            if (str[i] == " ") {
+            if (str[i] === " ") {
                 const v = Math.abs(i - half);
                 if (v < splitValue) {
                     bestSplitPoint = i;
@@ -298,59 +306,18 @@ export class Timeline {
                 }
             }
         }
-        if (bestSplitPoint != 0) {
+        if (bestSplitPoint !== 0) {
             return [str.slice(0, bestSplitPoint), str.slice(bestSplitPoint + 1, str.length)];
         }
         else {
             return null;
         }
     }
-    //pure fn
-    static calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels) {
-        let i = prevEndpoints.length - 1;
-        let level = 0;
-        // Given previous endpoints within the span of event's bounds,
-        // find the highest level needed to not overlap,
-        // starting with the closest endpoints.
-        //~`for i = prevEndpoints.length - 1; i--`
-        //left boundary < a prev endpoint → intersection
-        //    → higher level needed than the level of intersected endpoint
-        while (leftBoundary < prevEndpoints[i] && i >= 0) {
-            level = Math.max(level, prevLevels[i] + 1);
-            i -= 1;
-        }
-        return level;
-    }
     calculateEventLeftBoundary(event, eventEndpoint) {
         const textWidth = this.getTextWidth2(event);
         const extraFudge = 0; // Why is this needed?
         const leftBoundary = eventEndpoint - (textWidth + this.calloutProperties.width + Timeline.textFudge + extraFudge);
         return leftBoundary;
-    }
-    // not pure fn
-    // modifies prev*
-    /** Layout callouts so that text will not overlap with vertical lines. */
-    calculateCalloutHeight(eventEndpoint, prevEndpoints, prevLevels, event) {
-        // ensure text does not overlap with previous entries
-        const leftBoundary = this.calculateEventLeftBoundary(event, eventEndpoint);
-        let level = Timeline.calculateCalloutLevel(leftBoundary, prevEndpoints, prevLevels);
-        const bif = Timeline.bifurcateString(event);
-        if (bif) {
-            //longest of 2 stings
-            const bifEvent = max(bif[0], bif[1], val => this.getTextWidth2(val));
-            const bifBoundary = this.calculateEventLeftBoundary(bifEvent, eventEndpoint);
-            // occupying 2 lines → +1
-            const bifLevel = Timeline.calculateCalloutLevel(bifBoundary, prevEndpoints, prevLevels) + 1;
-            //compare levels somehow
-            if (bifLevel < level) {
-                level = bifLevel;
-                event = bif.join("\n");
-            }
-        }
-        const calloutHeight = level * this.calloutProperties.increment;
-        prevEndpoints.push(eventEndpoint);
-        prevLevels.push(level);
-        return [calloutHeight, event];
     }
     debugMap = [];
     putInDebugMap(str, level, point) {
@@ -364,17 +331,28 @@ export class Timeline {
         }
         this.debugMap[level][point] = str;
     }
-    /* endpointMap (mut): For each level (row), the list of endpoints on that level */
-    calculateCalloutHeight2(eventEndpoint, endpointMap, event) {
+    calculateCalloutHeight2(eventEndpoint, callout, calloutLayout) {
+        if (callout.tie) {
+            const target = calloutLayout.idMap[callout.tie];
+            const calloutHeight = target.level * this.calloutProperties.increment;
+            calloutLayout.lockedLevelMap[target.level] = false;
+            return [target.x, calloutHeight, ""];
+        }
         // TODO: Clean this up. It's nasty down here
+        const endpointMap = calloutLayout.endpointMap;
+        let event = callout.description ?? "";
         // ensure text does not overlap with previous entries
         const leftPad = this.calloutProperties.width;
         const leftBoundary = this.calculateEventLeftBoundary(event, eventEndpoint) - leftPad;
         let level = 0; // Valid levels start at 1
         // Good if the left boundary of this event does not intersect the nearest event to the left
-        const isGood = function (row) {
+        const isGood = function (rowIndex) {
+            if (calloutLayout.lockedLevelMap[rowIndex]) {
+                return false;
+            }
+            const row = endpointMap[rowIndex];
             if (row) {
-                if (row.length == 0 || row[row.length - 1] < leftBoundary) {
+                if (row.length === 0 || row[row.length - 1] < leftBoundary) {
                     return true;
                 }
                 else {
@@ -389,13 +367,13 @@ export class Timeline {
         // Find the first level for which this event will not intersect another.
         // Also make sure that if drawing under an event there is 1 line of space.
         for (let levI = 0; levI < endpointMap.length; levI++) {
-            if (isGood(endpointMap[levI]) && isGood(endpointMap[levI + 1])) {
+            if (isGood(levI) && isGood(levI + 1)) {
                 level = levI + 1;
                 break;
             }
         }
         // If space couldn't be found on an existing level, make a new level for it
-        if (level == 0) {
+        if (level === 0) {
             level = endpointMap.length;
         }
         // ---------
@@ -406,9 +384,13 @@ export class Timeline {
         if (bif) {
             const bifEvent = max(bif[0], bif[1], val => this.getTextWidth2(val));
             bifLeftBoundary = this.calculateEventLeftBoundary(bifEvent, eventEndpoint) - leftPad;
-            const isGood = function (row) {
+            const isGood = function (rowIndex) {
+                if (calloutLayout.lockedLevelMap[rowIndex]) {
+                    return false;
+                }
+                const row = endpointMap[rowIndex];
                 if (row) {
-                    if (row.length == 0 || row[row.length - 1] < bifLeftBoundary) {
+                    if (row.length === 0 || row[row.length - 1] < bifLeftBoundary) {
                         return true;
                     }
                     else {
@@ -422,28 +404,41 @@ export class Timeline {
             for (let levI = 1; levI < endpointMap.length; levI++) {
                 // Same as above now with bifurcated boundary + the line below.
                 // Level is the top line of text.
-                if (isGood(endpointMap[levI - 1]) && isGood(endpointMap[levI]) && isGood(endpointMap[levI + 1])) {
+                if (isGood(levI - 1) && isGood(levI) && isGood(levI + 1)) {
                     bifLevel = levI + 1;
                     break;
                 }
             }
-            if (bifLevel == 0) {
+            if (bifLevel === 0) {
                 bifLevel = endpointMap.length + 1;
             }
         }
         // Select level
         //
+        /* After a certain point a title becomes too long to /not/ bifurcate. */
         const maxEventWidth = 50; // char... Dangerous with unicode?
-        const useBifurcated = bifLevel != 0 && (bifLevel <= level
+        const useBifurcated = bifLevel !== 0 && (bifLevel <= level
             || event.length > maxEventWidth);
-        // 
+        //
+        if (useBifurcated) {
+            level = bifLevel;
+        }
+        if (callout.id) {
+            if (calloutLayout.idMap[callout.id]) {
+                console.warn(`Error: multiple callouts with the id of '${callout.id}'.`);
+            }
+            calloutLayout.idMap[callout.id] = { x: eventEndpoint, level };
+            if (calloutLayout.ties.has(callout.id)) {
+                calloutLayout.lockedLevelMap[level] = true;
+            }
+        }
         if (useBifurcated) {
             while (bifLevel >= endpointMap.length) {
                 endpointMap.push([]);
             }
             endpointMap[bifLevel - 1].push(eventEndpoint);
             this.putInDebugMap(bif[0], bifLevel, eventEndpoint);
-            if (bifLevel != 1) {
+            if (bifLevel !== 1) {
                 endpointMap[bifLevel - 2].push(eventEndpoint);
                 this.putInDebugMap(bif[1], bifLevel - 1, eventEndpoint);
             }
@@ -474,7 +469,16 @@ export class Timeline {
         //# add callouts, one by one, making sure they don't overlap
         const prevX = [-Infinity];
         const prevLevel = [-1];
-        const endpointMap = [[]];
+        const calloutLayout = newCalloutLayout();
+        const seenIds = new Set();
+        for (let callout of this.data.callouts) {
+            if (callout.id) {
+                seenIds.add(callout.id);
+            }
+            if (callout.tie && seenIds.has(callout.tie)) {
+                calloutLayout.ties.add(callout.tie);
+            }
+        }
         //vertical drawing up is negative ~= max height
         let minY = Infinity;
         let minX = Infinity;
@@ -497,14 +501,22 @@ export class Timeline {
             // const bgFill = { color: bgColor, opacity: 0.15 };
             const bgFill = { color: bgColor, opacity: 1 };
             //# figure out what 'level" to make the callout on
-            // const [calloutHeight, event]: [number, string] = this.calculateCalloutHeight(x, prevX, prevLevel, callout.description);
-            const [leftBound, calloutHeight, event] = this.calculateCalloutHeight2(x, endpointMap, callout.description);
+            const [leftBound, calloutHeight, event] = this.calculateCalloutHeight2(x, callout, calloutLayout);
             const y = 0 - this.calloutProperties.height - calloutHeight;
             minY = Math.min(minY, y);
             minX = Math.min(minX, leftBound);
+            let lineLeftPoint = (x - this.calloutProperties.width);
+            if (callout.tie) {
+                if (calloutLayout.idMap[callout.tie] === undefined) {
+                    console.warn("Callout is tied to an id that is not (yet) on the timeline", callout);
+                }
+                else {
+                    lineLeftPoint = calloutLayout.idMap[callout.tie].x;
+                }
+            }
             //svg elements
             const pathData = ['M', x, ',', 0, ' L', x, ',', y, ' L',
-                (x - this.calloutProperties.width), ',', y].join("");
+                lineLeftPoint, ',', y].join("");
             const pth = this.axisGroup.path(pathData).stroke({ color: eventColor, width: 1, fill: "none" });
             pth.fill("none", 0);
             const bar = this.fontHeight;
@@ -624,7 +636,6 @@ export class Timeline {
     }
     // Generates svg document
     build() {
-        //# MAGIC NUMBER: y_era
         //# draw era label and markers at this height
         // const yEra: number = 5 + this.fontHeight;
         const yEra = 0 + this.fontHeight;
@@ -719,6 +730,22 @@ export function makeTestPattern3() {
         startDate: "2019-01-01",
         endDate: "2019-01-01",
         callouts: [{ description: "ahh", date: "2019-01-01" }],
+    };
+    return tln;
+}
+export function makeTestPattern_tie() {
+    const tln = {
+        apiVersion: 2,
+        width: 1000,
+        tickFormat: "%Y-%m-%d ",
+        startDate: "2019-01-01",
+        endDate: "2020-01-01",
+        callouts: [
+            { description: "ahh", date: "2019-01-01", id: "1", color: "blue" },
+            { date: "2020-01-01", tie: "1", color: "red" },
+            { date: "2019-03-01", description: "idk idk hello hello" },
+            { date: "2019-11-01", description: "idk" },
+        ],
     };
     return tln;
 }
