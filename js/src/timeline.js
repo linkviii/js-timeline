@@ -97,7 +97,7 @@ export class TimelineConverter {
  * For when a `!(0 <= percentWidth <= 100)`.
  * Shouldn't be possible though?
  */
-class OoBDate extends Error {
+export class OoBDate extends Error {
 }
 function newCalloutLayout() {
     return {
@@ -336,6 +336,7 @@ export class Timeline {
             const target = calloutLayout.idMap[callout.tie];
             const calloutHeight = target.level * this.calloutProperties.increment;
             calloutLayout.lockedLevelMap[target.level] = false;
+            calloutLayout.endpointMap[target.level - 1].push(eventEndpoint);
             return [target.x, calloutHeight, ""];
         }
         // TODO: Clean this up. It's nasty down here
@@ -511,7 +512,10 @@ export class Timeline {
                     console.warn("Callout is tied to an id that is not (yet) on the timeline", callout);
                 }
                 else {
-                    lineLeftPoint = calloutLayout.idMap[callout.tie].x;
+                    // lineLeftPoint = calloutLayout.idMap[callout.tie].x;
+                    const pathData = ['M', x, ",", y, ' L', leftBound, ',', y].join("");
+                    const path = this.axisGroup.path(pathData).stroke({ color: eventColor, width: 7, fill: "none" });
+                    path.fill("none", 0);
                 }
             }
             //svg elements

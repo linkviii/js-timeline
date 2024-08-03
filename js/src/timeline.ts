@@ -211,7 +211,7 @@ interface LabelKW {
  * For when a `!(0 <= percentWidth <= 100)`.
  * Shouldn't be possible though?
  */
-class OoBDate extends Error {
+export class OoBDate extends Error {
 }
 
 interface CalloutLocation {
@@ -402,7 +402,7 @@ export class Timeline {
     }
 
 
-    private dateToX(date: Date): number | OoBDate {
+    dateToX(date: Date): number | OoBDate {
 
         const percentWidth: number = (date.valueOf() - this.date0) / 1000 / this.totalSeconds;
 
@@ -567,6 +567,7 @@ export class Timeline {
             const calloutHeight = target.level * this.calloutProperties.increment;
 
             calloutLayout.lockedLevelMap[target.level] = false;
+            calloutLayout.endpointMap[target.level - 1].push(eventEndpoint);
 
             return [target.x, calloutHeight, ""];
         }
@@ -784,7 +785,11 @@ export class Timeline {
                 if (calloutLayout.idMap[callout.tie] === undefined) {
                     console.warn("Callout is tied to an id that is not (yet) on the timeline", callout);
                 } else {
-                    lineLeftPoint = calloutLayout.idMap[callout.tie].x;
+                    // lineLeftPoint = calloutLayout.idMap[callout.tie].x;
+                    const pathData = ['M', x, ",", y, ' L', leftBound, ',', y].join("");
+                    const path = this.axisGroup.path(pathData).stroke({ color: eventColor, width: 7, fill: "none" });
+                    path.fill("none", 0);
+
                 }
             }
 
