@@ -347,6 +347,9 @@ function newLayout() {
     };
 }
 export class Timeline {
+    static YMD = "%Y-%m-%d";
+    /**  */
+    subtic = false;
     fontSize;
     fontFamily;
     fontHeight;
@@ -471,7 +474,7 @@ export class Timeline {
     }
     addAxisLabel(dt, kw) {
         kw = kw || {};
-        const fill = kw.fill || Colors.gray;
+        const fill = kw.fill || Colors.black;
         let label;
         const dateFormat = kw.dateFormat ?? this.tickFormat;
         if (dateFormat) {
@@ -779,7 +782,7 @@ export class Timeline {
             txt.font({ family: this.fontFamily, size: `${this.fontSize}pt`, anchor: 'end' });
             txt.fill(eventColor);
             this.giveTxtBackground(txt, bgFill);
-            this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
+            this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black, dateFormat: this.data.tickFormatEvent ?? this.tickFormat });
             const circ = this.axisGroup.circle(8).attr({ fill: 'white', cx: x, cy: 0, stroke: eventColor });
         }
         if (!isFinite(minY)) {
@@ -814,7 +817,8 @@ export class Timeline {
             const tickFormat = {
                 tick: true,
                 fill: "black",
-                dateFormat: "%Y-%m                ",
+                dateFormat: this.data.tickFormatPeriod ?? this.tickFormat,
+                // dateFormat: "%Y-%m                ",
             };
             while (nextMonth.valueOf() < this.endDate.valueOf()) {
                 this.addAxisLabel(nextMonth, tickFormat);

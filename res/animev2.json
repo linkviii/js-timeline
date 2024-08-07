@@ -217,5 +217,7 @@
       "color": "#CD3F85"
     }
   ],
-  "tickFormat": "%Y-%m-%d"
+  "tickFormat": "%Y-%m-%d",
+  "tickFormatPeriod": "%Y-%m",
+  "tickFormatEvent": "%d"
 }

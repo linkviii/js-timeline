@@ -441,7 +441,12 @@ export interface TimelineDataV2 {
     startDate: string;
     endDate: string;
     numTicks?: number;
+
     tickFormat?: string;
+    tickFormatPeriod?: string;
+    tickFormatEvent?: string;
+
+
     callouts?: TimelineCalloutV2[];
     eras?: TimelineEraV2[];
 }
@@ -566,6 +571,8 @@ function newLayout(): TimelineLayout {
 }
 
 export class Timeline {
+
+    public static readonly YMD = "%Y-%m-%d";
 
     public readonly fontSize;
     public readonly fontFamily;
@@ -745,7 +752,7 @@ export class Timeline {
     private addAxisLabel(dt: Date, kw?: LabelKW): void {
 
         kw = kw || {};
-        const fill: string = kw.fill || Colors.gray;
+        const fill: string = kw.fill || Colors.black;
         let label: string;
         const dateFormat = kw.dateFormat ?? this.tickFormat;
         if (dateFormat) {
@@ -1148,7 +1155,9 @@ export class Timeline {
             this.giveTxtBackground(txt, bgFill);
 
 
-            this.addAxisLabel(calloutDate, { tick: false, fill: Colors.black });
+            this.addAxisLabel(calloutDate,
+                { tick: false, fill: Colors.black, dateFormat: this.data.tickFormatEvent ?? this.tickFormat }
+            );
             const circ = this.axisGroup.circle(8).attr({ fill: 'white', cx: x, cy: 0, stroke: eventColor });
 
         }
@@ -1192,7 +1201,8 @@ export class Timeline {
             const tickFormat: LabelKW = {
                 tick: true,
                 fill: "black",
-                dateFormat: "%Y-%m                ",
+                dateFormat: this.data.tickFormatPeriod ?? this.tickFormat,
+                // dateFormat: "%Y-%m                ",
             };
             while (nextMonth.valueOf() < this.endDate.valueOf()) {
 
